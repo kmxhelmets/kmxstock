@@ -1,0 +1,4214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NIJA Helmets — Stock Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script>
+try { document.documentElement.setAttribute("data-theme", localStorage.getItem("nija-stock-theme") === "light" ? "light" : "dark"); }
+catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+</script>
+<style>
+  :root {
+    --signal: #F2A413;
+    --signal-ink: #1a1200;
+    --bg: #0a0a0c;
+    --surface: #17171b;
+    --surface-2: #1f1f25;
+    --border: #2a2a32;
+    --text: #f2f2f4;
+    --text-dim: #8b8b95;
+    --text-dimmer: #55555f;
+    --success: #22c55e;
+    --success-ink: #04170c;
+    --success-bg: #12281a;
+    --success-border: #1c3a26;
+    --danger: #ef4444;
+    --danger-ink: #2a0808;
+    --danger-bg: #2a1416;
+    --danger-border: #3a1e20;
+    --warn-bg: #2b2113; --warn-fg: #fbbf24; --warn-bd: #3f301b;
+    --info-bg: #0c2333; --info-fg: #38bdf8; --info-bd: #143348;
+    --chip-hover: #3a3a44;
+    --accent-tint: rgba(242,164,19,0.12);
+    --accent-tint-border: rgba(242,164,19,0.4);
+    --focus-ring: rgba(242,164,19,0.15);
+    --empty-icon: #3a3a44;
+    --helmet-bg: #0c2333; --helmet-fg: #38bdf8; --helmet-bd: #143348;
+    --frame-bg: #10262b; --frame-fg: #2dd4bf; --frame-bd: #17383f;
+    --plastic-box-bg: #2b2113; --plastic-box-fg: #fbbf24; --plastic-box-bd: #3f301b;
+    --aluminum-box-bg: #1a2029; --aluminum-box-fg: #94a3b8; --aluminum-box-bd: #28303c;
+    --leather-bag-bg: #2b1d12; --leather-bag-fg: #fb923c; --leather-bag-bd: #3d2a1a;
+    --mirror-bg: #0c262b; --mirror-fg: #22d3ee; --mirror-bd: #12363d;
+    --phone-holders-bg: #221a2e; --phone-holders-fg: #a78bfa; --phone-holders-bd: #322745;
+    --water-bottle-holders-bg: #181b32; --water-bottle-holders-fg: #818cf8; --water-bottle-holders-bd: #242949;
+    --windshield-bg: #23260f; --windshield-fg: #a3e635; --windshield-bd: #333818;
+    --brake-pads-bg: #2b1616; --brake-pads-fg: #f87171; --brake-pads-bd: #3d2020;
+    --oil-bg: #12261a; --oil-fg: #4ade80; --oil-bd: #1b3826;
+    --accessory-bg: #2a1523; --accessory-fg: #f472b6; --accessory-bd: #3d1f32;
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+  html[data-theme="light"] {
+    --signal: #b45309;
+    --signal-ink: #ffffff;
+    --bg: #f3f4f6;
+    --surface: #ffffff;
+    --surface-2: #eef0f3;
+    --border: #e3e6eb;
+    --text: #1c1f27;
+    --text-dim: #5c6370;
+    --text-dimmer: #9aa2ad;
+    --success: #16a34a;
+    --success-ink: #ffffff;
+    --success-bg: #e8f6ee;
+    --success-border: #bfe8cf;
+    --danger: #dc2626;
+    --danger-ink: #ffffff;
+    --danger-bg: #fdecec;
+    --danger-border: #f6c9c9;
+    --warn-bg: #fdf2df; --warn-fg: #a16207; --warn-bd: #f6e0b5;
+    --info-bg: #e8f3fd; --info-fg: #0d6dc4; --info-bd: #c3e0f8;
+    --chip-hover: #b9c0c9;
+    --accent-tint: rgba(180,83,9,0.08);
+    --accent-tint-border: rgba(180,83,9,0.4);
+    --focus-ring: rgba(180,83,9,0.18);
+    --empty-icon: #c9ced6;
+
+    --helmet-bg: #e8f3fd; --helmet-fg: #0d6dc4; --helmet-bd: #c3e0f8;
+    --frame-bg: #e2f6f5; --frame-fg: #0d7d75; --frame-bd: #bce7e3;
+    --plastic-box-bg: #fdf2df; --plastic-box-fg: #a16207; --plastic-box-bd: #f6e0b5;
+    --aluminum-box-bg: #eef1f5; --aluminum-box-fg: #475569; --aluminum-box-bd: #d3dae3;
+    --leather-bag-bg: #fdefe2; --leather-bag-fg: #c2410c; --leather-bag-bd: #f8d7bd;
+    --mirror-bg: #e0f6fa; --mirror-fg: #0e7490; --mirror-bd: #b8e6ef;
+    --phone-holders-bg: #f2edfc; --phone-holders-fg: #6d28d9; --phone-holders-bd: #ddd0fa;
+    --water-bottle-holders-bg: #eceefd; --water-bottle-holders-fg: #4338ca; --water-bottle-holders-bd: #cfd4fa;
+    --windshield-bg: #eef7dd; --windshield-fg: #4d7c0f; --windshield-bd: #d5e9b4;
+    --brake-pads-bg: #fdeaea; --brake-pads-fg: #b91c1c; --brake-pads-bd: #f6c6c6;
+    --oil-bg: #e7f7ec; --oil-fg: #15803d; --oil-bd: #bfe6cb;
+    --accessory-bg: #fdecf4; --accessory-fg: #be185d; --accessory-bd: #f9c9de;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+      "Noto Sans Khmer", "Khmer OS Battambang", "Khmer OS", "Leelawadee UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background .2s ease, color .2s ease;
+  }
+  button, input, select, textarea { font-family: inherit; }
+  html[lang="km"] body { line-height: 1.6; }
+  html[lang="km"] .tab-btn,
+  html[lang="km"] .chip,
+  html[lang="km"] .product-name,
+  html[lang="km"] .pick-name,
+  html[lang="km"] .del-name,
+  html[lang="km"] .imp-name { line-height: 1.7; }
+  html[lang="km"] .row-stock-label,
+  html[lang="km"] .brand-stat-label { line-height: 1.5; }
+  #app { max-width: 720px; margin: 0 auto; min-height: 100vh; padding-bottom: 40px; }
+
+  .loading, .setup-notice {
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    min-height: 70vh; padding: 32px; text-align: center; color: var(--text-dim); font-size: 14px;
+  }
+  .setup-notice h2 { color: var(--text); font-size: 16px; margin: 0 0 8px; }
+  .setup-notice p { max-width: 420px; line-height: 1.5; margin: 0; }
+  .spinner {
+    width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--signal);
+    border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; margin-right: 8px; vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .shell { border: 1px solid var(--border); border-radius: var(--radius-lg); margin: 16px; overflow: hidden; background: var(--bg); transition: background .2s ease; }
+  html[data-theme="light"] .shell { background: var(--surface); box-shadow: 0 1px 3px rgba(20,30,50,0.06); }
+  @media (max-width: 480px) { .shell { margin: 0; border-radius: 0; border-left: none; border-right: none; box-shadow: none; } }
+
+  .header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+  .brand { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+  .cat-select.header-filter { min-width: 108px; max-width: 220px; }
+  /* On a phone, keep the filter + Add Product on the logo's row: the title can
+     shrink, the filter gets narrow, and Add Product collapses to a + icon. */
+  @media (max-width: 560px) {
+    .cat-select.header-filter { min-width: 96px; max-width: 116px; padding-right: 22px; }
+    .header-add .btn-label { display: none; }
+    .header-add { padding: 8px 10px; }
+    .brand { gap: 8px; }
+    .brand-left { gap: 8px; }
+    .back-btn { width: 32px; height: 32px; }
+    .brand-mark { width: 32px; height: 32px; }
+  }
+  .brand-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
+  .brand-mark {
+    width: 36px; height: 36px; flex-shrink: 0; border-radius: var(--radius); background: var(--accent-tint);
+    border: 1px solid var(--accent-tint-border); color: var(--signal); display: flex; align-items: center; justify-content: center;
+  }
+  .brand-text { min-width: 0; overflow: hidden; }
+  .brand-text h1 { font-size: 16px; margin: 0; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand-text p { font-size: 12px; margin: 1px 0 0; color: var(--text-dim); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .header-btns { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .lang-btn { font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+  .theme-btn {
+    width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-dim); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: color .15s ease, border-color .15s ease;
+  }
+  .theme-btn:hover { color: var(--text); border-color: var(--chip-hover); }
+
+  /* Home launcher: a grid of menu tiles. */
+  .launcher { max-width: 720px; margin: 0 auto; }
+  .launcher-search { margin-bottom: 18px; }
+  .launcher-title { font-size: 16px; font-weight: 600; text-align: center; margin: 0 0 20px; color: var(--text); }
+  .launcher-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px 16px; }
+  html[data-theme="light"] .launcher-grid { background: var(--surface); border-color: var(--border); box-shadow: 0 10px 30px rgba(30,41,59,.10); }
+  .launch-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; background: none; border: none; padding: 6px; cursor: pointer; color: var(--text); font-size: 13px; font-weight: 600; transition: color .15s ease; }
+  .launch-tile:hover { color: var(--text); }
+  .launch-ic { position: relative; width: 68px; height: 68px; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: var(--tile-bg); color: var(--tile-fg); transition: transform .15s ease, box-shadow .15s ease; }
+  .launch-tile:hover .launch-ic { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+  .launch-label { line-height: 1.2; text-align: center; }
+  .tab-badge { position: absolute; top: -5px; right: -5px; min-width: 18px; padding: 1px 5px; border-radius: 999px; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; line-height: 1.5; text-align: center; box-shadow: 0 0 0 2px var(--surface); }
+  /* Back button that returns to the home menu from a section page. */
+  .back-btn {
+    width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-dim); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: color .15s ease, border-color .15s ease;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--chip-hover); }
+  .hist-btn { color: #f59e0b; }
+  .section-title { font-size: 19px; font-weight: 700; margin: 0; color: var(--text); line-height: 1.2; }
+  .section-ic { display: inline-flex; align-items: center; flex-shrink: 0; }
+  .header svg.icon-up { color: var(--success); }
+  .header svg.icon-down { color: var(--danger); }
+
+  .content { padding: 20px; }
+
+  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .chip {
+    padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid var(--border);
+    background: none; color: var(--text-dim); cursor: pointer; transition: border-color .15s ease, color .15s ease;
+  }
+  .chip:hover { border-color: var(--chip-hover); }
+  .chip-sort { margin-left: auto; display: inline-flex; align-items: center; gap: 5px; }
+  .chip.chip-active { background: var(--accent-tint); border-color: var(--accent-tint-border); color: var(--signal); }
+  .btn { display: inline-flex; align-items: center; gap: 5px; border: none; cursor: pointer; font-weight: 500; transition: filter .15s ease; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn-primary { background: var(--signal); color: var(--signal-ink); padding: 7px 14px; border-radius: 999px; font-size: 12px; }
+  .btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .chip-add { margin-left: auto; }
+
+  .search-wrap { position: relative; margin-bottom: 16px; }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-dimmer); display: flex; }
+  .input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 9px 12px; font-size: 14px; color: var(--text); outline: none; transition: border-color .15s ease;
+  }
+  .input::placeholder { color: var(--text-dimmer); }
+  .input:focus { border-color: var(--signal); box-shadow: 0 0 0 3px var(--focus-ring); }
+  .input-search { padding-left: 34px; }
+
+  .product-list, .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .product-row, .history-row {
+    display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--border);
+  }
+  .product-row { flex-wrap: wrap; }
+  html[data-theme="light"] .product-row, html[data-theme="light"] .history-row { background: var(--bg); }
+  .product-info { flex: 1; min-width: 0; }
+  .row-thumb { width: 42px; height: 42px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); }
+  .row-thumb-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dimmer); }
+  .product-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+  .product-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; max-width: 100%; }
+  .cat-tag { flex-shrink: 0; margin-left: auto; white-space: nowrap; font-size: 11px; padding: 2px 7px; border-radius: 5px; border: 1px solid transparent; line-height: 1.5; }
+  .cat-helmet { background: var(--helmet-bg); color: var(--helmet-fg); border-color: var(--helmet-bd); }
+  .cat-frame { background: var(--frame-bg); color: var(--frame-fg); border-color: var(--frame-bd); }
+  .cat-plastic-box { background: var(--plastic-box-bg); color: var(--plastic-box-fg); border-color: var(--plastic-box-bd); }
+  .cat-aluminum-box { background: var(--aluminum-box-bg); color: var(--aluminum-box-fg); border-color: var(--aluminum-box-bd); }
+  .cat-leather-bag { background: var(--leather-bag-bg); color: var(--leather-bag-fg); border-color: var(--leather-bag-bd); }
+  .cat-mirror { background: var(--mirror-bg); color: var(--mirror-fg); border-color: var(--mirror-bd); }
+  .cat-phone-holders { background: var(--phone-holders-bg); color: var(--phone-holders-fg); border-color: var(--phone-holders-bd); }
+  .cat-water-bottle-holders { background: var(--water-bottle-holders-bg); color: var(--water-bottle-holders-fg); border-color: var(--water-bottle-holders-bd); }
+  .cat-windshield { background: var(--windshield-bg); color: var(--windshield-fg); border-color: var(--windshield-bd); }
+  .cat-brake-pads { background: var(--brake-pads-bg); color: var(--brake-pads-fg); border-color: var(--brake-pads-bd); }
+  .cat-oil { background: var(--oil-bg); color: var(--oil-fg); border-color: var(--oil-bd); }
+  .cat-accessory { background: var(--accessory-bg); color: var(--accessory-fg); border-color: var(--accessory-bd); }
+  .low-flag { flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--danger); }
+  .product-meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .product-extra {
+    display: flex; gap: 6px; flex-wrap: nowrap; margin-top: 2px; min-width: 0;
+    /* 42px thumbnail + 12px row gap keeps it aligned with the product name. */
+    flex: 0 0 calc(100% - 54px); margin-left: 54px; box-sizing: border-box;
+  }
+  .extra-item {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500;
+    color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: var(--radius-sm); line-height: 1.4;
+    min-width: 0; flex: 0 1 auto;
+  }
+  .extra-ico { display: flex; flex-shrink: 0; }
+  .extra-item svg { flex-shrink: 0; color: var(--signal); }
+  .extra-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .extra-barcode .extra-text { font-variant-numeric: tabular-nums; }
+  /* The location is short, so let the barcode take the leftover room. */
+  .extra-item:first-child { flex-shrink: 0; }
+  .extra-barcode { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .02em; }
+  .row-stock { flex-shrink: 0; text-align: right; padding: 0 2px; }
+  .row-stock-num { font-size: 20px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--text); }
+  .row-stock-num.low { color: var(--danger); }
+  .row-stock-label { font-size: 10px; color: var(--text-dimmer); margin-top: 1px; white-space: nowrap; }
+
+  .row-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+  .icon-btn { background: none; border: none; color: var(--text-dim); padding: 7px; border-radius: var(--radius-sm); cursor: pointer; display: flex; }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn-up:hover { background: var(--success-bg); color: var(--success); }
+  .icon-btn-down:hover { background: var(--danger-bg); color: var(--danger); }
+  .confirm-row { display: flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
+  .btn-yes, .btn-no { border: none; padding: 5px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; cursor: pointer; }
+  .btn-yes { background: var(--danger-bg); color: var(--danger); }
+  .btn-no { background: var(--surface-2); color: var(--text-dim); }
+
+  .empty-state { text-align: center; padding: 56px 20px; color: var(--text-dim); }
+  .empty-state svg { color: var(--empty-icon); margin-bottom: 12px; }
+  .empty-title { font-size: 14px; color: var(--text); margin: 0 0 4px; }
+  .empty-sub { font-size: 12px; color: var(--text-dimmer); margin: 0 0 16px; max-width: 320px; margin-left: auto; margin-right: auto; }
+  .empty-inline { text-align: center; padding: 40px 0; color: var(--text-dim); font-size: 14px; }
+
+  .stock-form { max-width: 420px; }
+  .form-icon-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .form-icon-row h2 { font-size: 14px; font-weight: 600; margin: 0; }
+  .form-icon-row svg.icon-up { color: var(--success); }
+  .form-icon-row svg.icon-down { color: var(--danger); }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+  .row-thumb-btn {
+    position: relative; padding: 0; border: none; background: none; cursor: pointer;
+    flex-shrink: 0; display: block; line-height: 0; border-radius: var(--radius-sm);
+  }
+  .row-thumb-btn:hover .row-thumb { border-color: var(--signal); }
+  .scan-wrap { position: relative; }
+  /* 44px keeps the scan target comfortably tappable on a phone. */
+  .scan-btn {
+    position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--signal);
+    cursor: pointer; border-radius: var(--radius); padding: 0;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .scan-btn:hover, .scan-btn:active { background: var(--accent-tint); border-color: var(--accent-tint-border); }
+  .input-scan { padding-right: 58px; padding-top: 12px; padding-bottom: 12px; }
+
+  .chip-scan { display: inline-flex; align-items: center; gap: 5px; border-color: var(--accent-tint-border); color: var(--signal); }
+
+  /* Continuous scan session: list on top, live camera pinned at the bottom. */
+  .sess-overlay {
+    position: fixed; inset: 0; z-index: 120; background: var(--bg);
+    display: flex; flex-direction: column;
+  }
+  .sess-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .sess-title { font-size: 14px; font-weight: 600; }
+  .sess-list { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 14px; }
+  .sess-empty { text-align: center; color: var(--text-dim); font-size: 13px; padding: 28px 10px; }
+  .sess-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface); margin-bottom: 8px;
+  }
+  html[data-theme="light"] .sess-row { background: var(--surface); }
+  .sess-info { flex: 1; min-width: 0; }
+  .sess-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sess-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .sess-qty { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .sess-step {
+    width: 34px; height: 34px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text); font-size: 17px; line-height: 1;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
+  }
+  .sess-step:active { background: var(--accent-tint); }
+  .sess-num { min-width: 30px; text-align: center; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sess-del {
+    width: 30px; height: 30px; border: none; background: none; color: var(--text-dimmer);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sess-del:hover { color: var(--danger); }
+  .sess-cam {
+    position: relative; flex-shrink: 0; height: 34vh; min-height: 170px;
+    background: #000; overflow: hidden; border-top: 1px solid var(--border);
+  }
+  .sess-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sess-frame {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: min(70%, 300px); height: 46%;
+    border: 2px solid var(--signal); border-radius: var(--radius); pointer-events: none;
+  }
+  .sess-flash {
+    margin: 8px 14px 0; border-radius: var(--radius);
+    font-size: 13px; font-weight: 500; text-align: center; color: #fff;
+    max-height: 0; padding: 0 12px; opacity: 0; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+    transition: max-height .15s ease, opacity .15s ease, padding .15s ease;
+  }
+  .sess-flash-ok, .sess-flash-bad { max-height: 44px; padding: 9px 12px; opacity: 1; }
+  .sess-flash-ok { background: rgba(34,197,94,.92); }
+  .sess-flash-bad { background: rgba(239,68,68,.92); }
+  .sess-foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; border-top: 1px solid var(--border); flex-shrink: 0;
+  }
+  .sess-count { font-size: 13px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .sess-foot .btn { padding: 10px 18px; border-radius: var(--radius); font-size: 14px; }
+
+  /* Hardware scanner (USB/Bluetooth "gun") input: it types the code and hits
+     Enter. Kept focused so a scan always lands here; also lets you type. */
+  .sess-hw { padding: 10px 14px 0; flex-shrink: 0; }
+  .sess-hw-input {
+    width: 100%; box-sizing: border-box; padding: 12px 14px;
+    border: 1px solid var(--accent-tint-border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); font-size: 15px;
+    font-family: inherit;
+  }
+  .sess-hw-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  .sess-hw-input::placeholder { color: var(--text-dimmer); }
+  /* No camera (e.g. a computer): drop the video panel entirely and let the
+     list fill the space -- the scan box above is all that's needed. */
+  .sess-cam.sess-cam-off { display: none; }
+  /* The close button is shared with the dark image viewer, where white is
+     right. On the light session header it needs theme-aware contrast. */
+  .sess-bar .lb-close {
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .sess-bar .lb-close:hover { background: var(--accent-tint); color: var(--text); border-color: var(--accent-tint-border); }
+
+  @media (min-width: 1024px) {
+    .sess-overlay { max-width: 640px; margin: 0 auto; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+  }
+
+  .scan-overlay {
+    position: fixed; inset: 0; z-index: 110; background: rgba(0,0,0,.94);
+    display: flex; flex-direction: column;
+  }
+  .scan-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; color: #fff; flex-shrink: 0;
+  }
+  .scan-title { font-size: 14px; font-weight: 500; }
+  .scan-stage {
+    flex: 1; min-height: 0; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .scan-video { width: 100%; height: 100%; object-fit: cover; }
+  .scan-frame {
+    position: absolute; width: min(74vw, 320px); height: min(42vw, 190px);
+    border: 2px solid var(--signal); border-radius: var(--radius);
+    box-shadow: 0 0 0 9999px rgba(0,0,0,.42); pointer-events: none;
+  }
+  .scan-msg {
+    color: rgba(255,255,255,.85); font-size: 13px; text-align: center;
+    padding: 14px 20px 24px; margin: 0; line-height: 1.5; flex-shrink: 0;
+  }
+
+  .lb-overlay {
+    position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.92);
+    display: flex; flex-direction: column; animation: lbIn .15s ease;
+  }
+  @keyframes lbIn { from { opacity: 0; } to { opacity: 1; } }
+  .lb-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; color: #fff; flex-shrink: 0;
+  }
+  .lb-title { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-close {
+    width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.12); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lb-close:hover { background: rgba(255,255,255,.22); }
+  .lb-stage {
+    flex: 1; min-height: 0; position: relative;
+    display: flex; align-items: center; justify-content: center; padding: 0 8px;
+  }
+  .lb-img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius-sm); }
+  .lb-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px; border-radius: 50%; border: none;
+    background: rgba(255,255,255,.12); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lb-nav:hover { background: rgba(255,255,255,.22); }
+  .lb-prev { left: 10px; }
+  .lb-next { right: 10px; }
+  .lb-counter { text-align: center; color: rgba(255,255,255,.75); font-size: 12px; padding: 8px 0 4px; font-variant-numeric: tabular-nums; }
+  .lb-strip {
+    display: flex; gap: 8px; padding: 10px 14px 18px; overflow-x: auto;
+    justify-content: center; flex-shrink: 0; scrollbar-width: none;
+  }
+  .lb-strip::-webkit-scrollbar { display: none; }
+  .lb-thumb {
+    width: 54px; height: 54px; flex-shrink: 0; padding: 0; cursor: pointer;
+    border-radius: var(--radius-sm); overflow: hidden; border: 2px solid transparent;
+    background: rgba(255,255,255,.08); opacity: .55; transition: opacity .15s ease;
+  }
+  .lb-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lb-thumb:hover { opacity: .85; }
+  .lb-thumb-on { border-color: var(--signal); opacity: 1; }
+  @media (max-width: 560px) {
+    .lb-nav { width: 36px; height: 36px; }
+    .lb-strip { justify-content: flex-start; }
+  }
+
+  .photo-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .photo-cell { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+  .photo-thumb {
+    width: 100%; height: 100%; padding: 0; border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; display: block;
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-cell:first-child .photo-thumb { border-color: var(--signal); }
+  .photo-thumb:hover { border-color: var(--signal); }
+  .photo-main-tag {
+    position: absolute; left: 4px; bottom: 4px; padding: 1px 6px; border-radius: 4px;
+    background: var(--signal); color: var(--signal-ink); font-size: 10px; font-weight: 600; pointer-events: none;
+  }
+  .photo-box {
+    width: 84px; height: 84px; border-radius: var(--radius); border: 1px dashed var(--border);
+    background: var(--surface); display: flex; align-items: center; justify-content: center; flex-direction: column;
+    gap: 4px; cursor: pointer; overflow: hidden; color: var(--text-dimmer); text-align: center; flex-shrink: 0;
+  }
+  .photo-box:hover { border-color: var(--chip-hover); color: var(--text-dim); }
+  .photo-box span { font-size: 10px; }
+  /* This tile is a <label>, so the generic ".form-group label" rule was
+     forcing display:block and flattening the icon and text onto one line.
+     Restore the flex column so the camera icon sits centered with "Add photo"
+     directly beneath it. */
+  .form-group label.photo-box { display: flex; margin-bottom: 0; }
+  .photo-file-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .photo-remove {
+    position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--danger); color: var(--danger-ink); border: 2px solid var(--bg); display: flex;
+    align-items: center; justify-content: center; cursor: pointer; padding: 0; z-index: 1;
+  }
+  .photo-processing { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+  .hint { font-size: 12px; color: var(--text-dimmer); margin: 5px 0 0; font-variant-numeric: tabular-nums; }
+  .form-error { font-size: 12px; color: var(--danger); margin: 0 0 12px; }
+  .muted { color: var(--text-dim); font-size: 13px; }
+  .link-btn { background: none; border: none; color: var(--signal); font-weight: 500; font-size: 13px; cursor: pointer; padding: 0; }
+  .link-btn:hover { text-decoration: underline; }
+
+  .submit-btn { width: 100%; padding: 11px; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; transition: filter .15s ease; }
+  .submit-btn:hover { filter: brightness(1.1); }
+  .submit-in { background: var(--success); color: var(--success-ink); }
+  .submit-out { background: var(--danger); color: var(--danger-ink); }
+
+  .history-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .history-icon-in { background: var(--success-bg); color: var(--success); }
+  .history-icon-out { background: var(--danger-bg); color: var(--danger); }
+  .history-info { flex: 1; min-width: 0; }
+  .history-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .history-amount { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  .amount-in { color: var(--success); }
+  .amount-out { color: var(--danger); }
+
+  .product-form-page { max-width: 420px; }
+  .page-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .page-actions .btn { flex: 1; justify-content: center; padding: 9px; border-radius: var(--radius); font-size: 13px; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(10px);
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 18px; border-radius: 999px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 60; max-width: 90vw;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .toast.toast-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .hist-summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .hist-net { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+  .dup-page { max-width: 520px; }
+  .dup-ok {
+    display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin-bottom: 16px;
+    background: var(--success-bg); border: 1px solid var(--success-border); border-radius: var(--radius);
+    font-size: 12px; color: var(--success); line-height: 1.5;
+  }
+  .dup-section { margin-bottom: 22px; }
+  .dup-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .dup-head h3 { font-size: 13px; font-weight: 600; margin: 0; }
+  .dup-head-icon { display: flex; }
+  .dup-badge {
+    font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px;
+    background: var(--surface-2); color: var(--text-dim);
+  }
+  .dup-section-danger .dup-head-icon { color: var(--danger); }
+  .dup-section-warn .dup-head-icon { color: var(--warn-fg); }
+  .dup-section-info .dup-head-icon { color: var(--info-fg); }
+  .dup-section-danger .dup-badge { background: var(--danger-bg); color: var(--danger); }
+  .dup-section-warn .dup-badge { background: var(--warn-bg); color: var(--warn-fg); }
+  .dup-section-info .dup-badge { background: var(--info-bg); color: var(--info-fg); }
+  .dup-empty { font-size: 12px; color: var(--text-dimmer); margin: 0; }
+  .dup-group {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 8px; background: var(--surface);
+  }
+  html[data-theme="light"] .dup-group { background: var(--bg); }
+  .dup-danger { border-color: var(--danger-border); }
+  .dup-warn { border-color: var(--warn-bd); }
+  .dup-info { border-color: var(--info-bd); }
+  .dup-value {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 8px 10px; background: var(--surface-2); border-bottom: 1px solid var(--border);
+  }
+  .dup-danger .dup-value { background: var(--danger-bg); border-bottom-color: var(--danger-border); }
+  .dup-warn .dup-value { background: var(--warn-bg); border-bottom-color: var(--warn-bd); }
+  .dup-info .dup-value { background: var(--info-bg); border-bottom-color: var(--info-bd); }
+  .dup-danger .dup-value-text { color: var(--danger); }
+  .dup-warn .dup-value-text { color: var(--warn-fg); }
+  .dup-info .dup-value-text { color: var(--info-fg); }
+  .dup-value-text {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .dup-count { font-size: 11px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+  .dup-items { display: flex; flex-direction: column; }
+  .dup-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px; width: 100%; text-align: left;
+    background: none; border: none; border-top: 1px solid var(--border); cursor: pointer; color: var(--text);
+  }
+  .dup-item:first-child { border-top: none; }
+  .dup-item:hover { background: var(--surface-2); }
+  .dup-item .row-thumb, .dup-item .row-thumb-placeholder { width: 44px; height: 44px; }
+  .dup-item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .dup-item-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dup-item-meta { font-size: 12px; color: var(--text-dim); }
+  .dup-item-edit { color: var(--text-dimmer); flex-shrink: 0; display: flex; }
+  .dup-item:hover .dup-item-edit { color: var(--signal); }
+  .dup-note { font-size: 11px; color: var(--text-dimmer); margin: -12px 0 0; line-height: 1.5; }
+  /* On a phone the sections stack, so an empty check (e.g. no duplicate
+     barcodes) would sit between two real sections as a gap. Hide the empty
+     ones on narrow screens; on desktop they usefully fill their column. */
+  @media (max-width: 1023px) { .dup-section-empty { display: none; } }
+
+  .cat-select { width: auto; min-width: 150px; max-width: 60%; flex: 0 1 auto; padding-right: 30px; }
+  .pick-search { margin-bottom: 8px; }
+  .pick-list { display: flex; flex-direction: column; gap: 6px; }
+  .pick-row {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; width: 100%; text-align: left;
+    border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; color: var(--text); transition: border-color .15s ease;
+  }
+  html[data-theme="light"] .pick-row { background: var(--bg); }
+  .pick-row:hover { border-color: var(--signal); }
+  .pick-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .pick-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pick-meta { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pick-stock { flex-shrink: 0; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pick-stock.low { color: var(--danger); }
+  .picked-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px;
+    border-radius: var(--radius); background: var(--accent-tint); border: 1px solid var(--accent-tint-border);
+  }
+  .picked-info { flex: 1; min-width: 0; }
+  .picked-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .picked-meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  .import-page { max-width: 480px; }
+  .import-drop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+    padding: 24px 16px; border: 1px dashed var(--border); border-radius: var(--radius);
+    background: var(--surface); color: var(--text-dim); cursor: pointer; text-align: center;
+    transition: border-color .15s ease, color .15s ease; margin-bottom: 14px;
+  }
+  html[data-theme="light"] .import-drop { background: var(--bg); }
+  .import-drop:hover { border-color: var(--signal); color: var(--text); }
+  .import-drop svg { color: var(--signal); }
+  .import-drop-title { font-size: 14px; font-weight: 500; color: var(--text); word-break: break-all; }
+  .import-drop-sub { font-size: 11px; color: var(--text-dimmer); }
+  .import-legend { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .import-legend p { margin: 0 0 4px; }
+  .import-legend ol { margin: 0 0 8px; padding-left: 20px; }
+  .import-legend-note { color: var(--text-dimmer); }
+  .import-summary { display: flex; gap: 8px; margin-bottom: 10px; }
+  .imp-pill { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: filter .15s ease, border-color .15s ease; }
+  .imp-pill:hover { filter: brightness(1.12); }
+  .imp-pill.active { border-color: currentColor; font-weight: 700; }
+  .imp-pill-all { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+  .imp-pill-ok { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .imp-pill-bad { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+  .imp-example { max-width: 640px; }
+  .imp-example-title { font-size: 13px; font-weight: 600; margin: 0 0 10px; }
+  .imp-table {
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+    background: var(--surface); font-variant-numeric: tabular-nums;
+  }
+  html[data-theme="light"] .imp-table { background: var(--bg); }
+  .imp-tr {
+    display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .6fr) minmax(0, 1fr);
+    gap: 12px; padding: 9px 12px; border-top: 1px solid var(--border); font-size: 13px;
+  }
+  .imp-tr:first-child { border-top: none; }
+  .imp-tr span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .imp-th { background: var(--surface-2); font-size: 11px; font-weight: 600; color: var(--text-dim); }
+  .imp-dim { color: var(--text-dimmer); }
+
+  .imp-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 420px; overflow-y: auto; }
+  .imp-row {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm);
+    background: var(--surface); border: 1px solid var(--border);
+  }
+  html[data-theme="light"] .imp-row { background: var(--bg); }
+  .imp-row-bad { background: var(--danger-bg); border-color: var(--danger-border); }
+  .imp-num {
+    flex-shrink: 0; min-width: 22px; font-size: 11px; color: var(--text-dimmer);
+    font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .imp-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .imp-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .imp-meta { font-size: 11px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; }
+  .imp-row-bad .imp-meta { color: var(--danger); }
+  .imp-qty { flex-shrink: 0; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 5px; }
+  .imp-row-bad .imp-qty { color: var(--danger); }
+
+  .labels-page { max-width: 1400px; }
+  .lbl-picker { max-height: 300px; overflow-y: auto; }
+  .gen-all {
+    display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+    padding: 10px; border-radius: var(--radius); font-size: 13px; margin-bottom: 14px;
+  }
+  .lbl-warn { color: var(--danger); }
+  .lbl-actions { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .lbl-actions .del-summary { margin: 0; }
+  .label-sheet { display: flex; flex-wrap: wrap; gap: 3mm; align-content: flex-start; }
+  .lbl {
+    background: #fff; color: #000; border: 1px solid #d8dde3; border-radius: 2px;
+    padding: 1.5mm 2mm; display: flex; flex-direction: column; justify-content: space-between;
+    overflow: hidden; box-sizing: border-box;
+  }
+  .lbl-name {
+    font-weight: 600; line-height: 1.15; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .lbl-bc { flex: 1; min-height: 0; display: flex; align-items: center; }
+  .lbl-bc .bc-svg { width: 100%; height: 100%; display: block; }
+  .lbl-code { text-align: center; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .04em; line-height: 1.1; }
+
+  @media print {
+    html, body { background: #fff !important; }
+    .no-print, .header, .shell > .header, .form-icon-row, .toast, .scan-overlay, .lb-overlay { display: none !important; }
+    .shell { border: none !important; margin: 0 !important; min-height: 0 !important; }
+    .content { padding: 0 !important; }
+    .split { display: block !important; }
+    .labels-page { max-width: none !important; }
+    .label-sheet { gap: 2mm; }
+    .lbl { border: 1px dashed #bbb; break-inside: avoid; page-break-inside: avoid; }
+  }
+
+  .delete-page { max-width: 480px; }
+  .del-input { resize: none; line-height: 1.5; font-family: inherit; }
+  .del-summary { font-size: 12px; color: var(--text-dim); margin: 0 0 10px; }
+  .notfound-box {
+    display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; margin-bottom: 12px;
+    background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: var(--radius);
+    font-size: 12px; color: var(--danger); line-height: 1.5;
+  }
+  .notfound-box svg { flex-shrink: 0; margin-top: 2px; }
+  .del-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .del-submit { padding: 9px 16px; border-radius: var(--radius); font-size: 13px; }
+  .del-submit[disabled] { opacity: .55; cursor: default; filter: none; }
+  .del-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px; width: 100%; text-align: left;
+    border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; color: var(--text); font-size: 14px; transition: border-color .15s ease, background .15s ease;
+  }
+  html[data-theme="light"] .del-row { background: var(--bg); }
+  .del-row:hover { border-color: var(--chip-hover); }
+  .del-row-on { border-color: var(--danger-border); background: var(--danger-bg); }
+  .del-check {
+    width: 20px; height: 20px; flex-shrink: 0; border-radius: 5px; border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center; color: #fff;
+  }
+  .del-check.on { background: var(--danger); border-color: var(--danger); }
+  .del-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .del-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .del-meta { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .danger-zone {
+    padding: 14px; border-radius: var(--radius); background: var(--danger-bg); border: 1px solid var(--danger-border);
+  }
+  .danger-zone p { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--text); }
+  .btn-danger { background: var(--danger); color: var(--danger-ink); }
+  .submit-btn[disabled], .btn[disabled] { opacity: .5; cursor: not-allowed; filter: none; }
+
+  @media (max-width: 560px) {
+    .product-row { gap: 10px; padding: 10px; align-items: flex-start; }
+    .product-extra { flex-basis: calc(100% - 52px); margin-left: 52px; }
+    .product-name { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+    .row-stock { padding-top: 2px; }
+    .row-actions { flex-wrap: wrap; justify-content: flex-end; max-width: 76px; }
+    .icon-btn { padding: 6px; }
+    .content { padding: 16px; }
+  }
+
+  /* Two-pane layouts collapse to a single column on small screens. */
+  .form-col, .split-side, .split-main { min-width: 0; }
+  .dup-groups { display: block; }
+
+  /* Desktop: fill the window and use the width for side-by-side working
+     panes, rather than stretching single inputs across the screen. */
+  @media (min-width: 1024px) {
+    #app { max-width: none; padding-bottom: 0; }
+    .shell {
+      margin: 0; border-radius: 0; border-left: none; border-right: none; border-top: none;
+      min-height: 100vh; box-shadow: none;
+    }
+    html[data-theme="light"] .shell { box-shadow: none; }
+    .header { padding: 20px 32px 18px; }
+    .launcher { max-width: none; }
+    .search-wrap.launcher-search { max-width: none; }
+    .launcher-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 30px 26px; max-width: 1040px; margin: 0 auto; }
+    .launch-ic { width: 104px; height: 104px; border-radius: 26px; }
+    .launch-ic svg { width: 42px; height: 42px; }
+    .launch-tile { font-size: 14px; gap: 12px; }
+    .content { padding: 24px 32px 40px; }
+
+    .product-list {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+      gap: 10px; align-items: start;
+    }
+    /* History stays a single column: a grid would run left-to-right then wrap,
+       which scrambles the date order. Capped so rows stay readable. */
+    .history-list { max-width: 1100px; }
+    .hist-summary, .history-list, .filter-row, .search-wrap { max-width: 1100px; }
+    /* Overview's toolbar and search run full width so they line up with the
+       edges of the product grid below, rather than stopping short of it. */
+    .filter-row.filter-row-overview, .search-wrap.search-wrap-overview { max-width: none; }
+
+    /* Stock In/Out and the product form: two working columns. */
+    .stock-form, .product-form-page form {
+      max-width: 1000px; display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 36px; align-items: start;
+    }
+    .stock-form { max-width: 940px; }
+    .product-form-page { max-width: none; }
+    .form-span { grid-column: 1 / -1; max-width: 420px; }
+
+    /* Delete and file import: controls on the left, results on the right. */
+    .split {
+      display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+      gap: 36px; align-items: start;
+    }
+    .import-page { max-width: 1400px; }
+    /* Fixed upload-panel height so it stays the same size no matter what's on
+       the right (example table, or a longer/shorter row list per filter). */
+    .import-page .import-drop { height: 175px; margin-bottom: 14px; }
+    .delete-page { max-width: none; }
+    .imp-list, .del-list { max-height: none; }
+    .del-list {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px;
+    }
+
+    /* Duplicates: two full-width columns like the Overview grid, so the cards
+       are large and easy to read; the third check wraps to a second row. */
+    .dup-page { max-width: none; }
+    .dup-cols {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 32px; align-items: start;
+    }
+    .dup-section { margin-bottom: 8px; }
+    .dup-groups { display: block; }
+    .dup-note { grid-column: 1 / -1; margin-top: 4px; }
+  }
+
+  @media (min-width: 1600px) {
+    .product-list { grid-template-columns: repeat(auto-fill, minmax(520px, 1fr)); }
+  }
+
+  input:focus-visible, select:focus-visible, button:focus-visible {
+    outline: 2px solid var(--signal); outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  onSnapshot, query, orderBy
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+// ============================================================
+// Connected to your existing nija-helmets Firebase project.
+// Only projectId + apiKey are needed here — Firestore doesn't use
+// authDomain/storageBucket/messagingSenderId/appId (those are for
+// Auth, Storage, and Messaging, which this app doesn't touch).
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBkMnqIFjcwHcCN7H4Xzenas-tJdqf5kK0",
+  projectId: "kmxhelmet",
+};
+
+const FIREBASE_NOT_CONFIGURED = !firebaseConfig.projectId;
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
+const CATEGORIES = [
+  "Helmet", "Frame", "Plastic box", "Aluminum box", "Leather bag", "Mirror",
+  "Phone holders", "Water bottle holders", "Windshield", "Brake Pads", "Oil", "Accessory",
+];
+// Stored value stays English; only the label changes with language.
+const CATEGORY_LABELS = {
+  "Helmet": "\u1798\u17bd\u1780\u179f\u17bb\u179c\u178f\u17d2\u178f\u17b7\u1797\u17b6\u1796",
+  "Frame": "\u1780\u17b6\u1784\u1798\u17c9\u17bc\u178f\u17bc",
+  "Plastic box": "\u1792\u17bb\u1784\u1787\u17d0\u179a",
+  "Aluminum box": "\u1792\u17bb\u1784\u17a2\u17ca\u17b8\u178e\u17bb\u1780",
+  "Leather bag": "\u1780\u17b6\u1794\u17bc\u1794\u179f\u17d2\u1794\u17c2\u1780",
+  "Mirror": "\u1780\u1789\u17d2\u1785\u1780\u17cb\u179b\u17c1\u1784",
+  "Phone holders": "\u1787\u17be\u1784\u1785\u17b6\u1794\u17cb\u1791\u17bc\u179a\u179f\u17d0\u1796\u17d2\u1791",
+  "Water bottle holders": "\u1787\u17be\u1784\u1785\u17b6\u1794\u17cb\u1780\u17c2\u179c\u1791\u17b9\u1780",
+  "Windshield": "\u179a\u1794\u17b6\u17c6\u1784\u1781\u17d2\u1799\u179b\u17cb",
+  "Brake Pads": "ស្បែកហ្វ្រាំង",
+  "Oil": "\u1794\u17d2\u179a\u17c1\u1784\u1798\u17c9\u17b6\u179f\u17ca\u17b8\u1793",
+  "Accessory": "\u1782\u17d2\u179a\u17bf\u1784\u179b\u17c1\u1784",
+};
+// Every photo for a product, tolerating older records that only have `photo`.
+// ---------------- Code 128 barcode generation ----------------
+// Drawn as SVG so it prints crisply. Code 128 is used because it handles
+// letters as well as digits, so IDs like "HLM-014" work, not just numbers.
+const CODE128_PATTERNS = [
+  "212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",
+  "221312","231212","112232","122132","122231","113222","123122","123221","223211","221132",
+  "221231","213212","223112","312131","311222","321122","321221","312212","322112","322211",
+  "212123","212321","232121","111323","131123","131321","112313","132113","132311","211313",
+  "231113","231311","112133","112331","132131","113123","113321","133121","313121","211331",
+  "231131","213113","213311","213131","311123","311321","331121","312113","312311","332111",
+  "314111","221411","431111","111224","111422","121124","121421","141122","141221","112214",
+  "112412","122114","122411","142112","142211","241211","221114","413111","241112","134111",
+  "111242","121142","121241","114212","124112","124211","411212","421112","421211","212141",
+  "214121","412121","111143","111341","131141","114113","114311","411113","411311","113141",
+  "114131","311141","411131","211412","211214","211232","2331112",
+];
+const CODE128_STOP = 106;
+
+// Returns the list of symbol values (without start/check/stop) plus which
+// subset to use. Subset C halves the width of long all-digit codes.
+function code128Values(text) {
+  const s = String(text);
+  const allDigits = /^\d+$/.test(s) && s.length % 2 === 0 && s.length >= 4;
+  if (allDigits) {
+    const vals = [];
+    for (let i = 0; i < s.length; i += 2) vals.push(parseInt(s.substr(i, 2), 10));
+    return { start: 105, values: vals };
+  }
+  const vals = [];
+  for (let i = 0; i < s.length; i++) {
+    const code = s.charCodeAt(i);
+    // Subset B covers printable ASCII; anything else is replaced so the label
+    // still scans rather than producing an invalid symbol.
+    vals.push(code >= 32 && code <= 126 ? code - 32 : "?".charCodeAt(0) - 32);
+  }
+  return { start: 104, values: vals };
+}
+
+function code128Symbols(text) {
+  const enc = code128Values(text);
+  let sum = enc.start;
+  for (let i = 0; i < enc.values.length; i++) sum += enc.values[i] * (i + 1);
+  const check = sum % 103;
+  return [enc.start].concat(enc.values, [check, CODE128_STOP]);
+}
+
+function barcodeSvg(text, widthPx, heightPx) {
+  const symbols = code128Symbols(text);
+  let modules = 0;
+  const runs = [];
+  for (let i = 0; i < symbols.length; i++) {
+    const pattern = CODE128_PATTERNS[symbols[i]];
+    for (let j = 0; j < pattern.length; j++) {
+      const w = parseInt(pattern[j], 10);
+      runs.push({ bar: j % 2 === 0, w: w });
+      modules += w;
+    }
+  }
+  let x = 0;
+  let rects = "";
+  for (let i = 0; i < runs.length; i++) {
+    if (runs[i].bar) {
+      rects += '<rect x="' + x + '" y="0" width="' + runs[i].w + '" height="' + heightPx + '" fill="#000"/>';
+    }
+    x += runs[i].w;
+  }
+  return '<svg class="bc-svg" viewBox="0 0 ' + modules + " " + heightPx +
+    '" preserveAspectRatio="none" width="' + widthPx + '" height="' + heightPx +
+    '" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">' + rects + "</svg>";
+}
+
+// The code printed on a label: prefer the real barcode, fall back to the ID.
+function labelCodeFor(p) {
+  const bc = String(p.barcode || "").trim();
+  if (bc) return bc;
+  return String(p.productId || "").trim();
+}
+
+// ---------------- in-store barcode generation ----------------
+// EAN-13 codes beginning 20-29 are reserved for in-store use, so numbers
+// generated here can never collide with a real supplier barcode.
+function ean13CheckDigit(twelve) {
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    const d = twelve.charCodeAt(i) - 48;
+    sum += (i % 2 === 0) ? d : d * 3;
+  }
+  return String((10 - (sum % 10)) % 10);
+}
+
+function usedBarcodeSet() {
+  const set = {};
+  for (let i = 0; i < state.products.length; i++) {
+    const b = String(state.products[i].barcode || "").trim();
+    if (b) set[b] = true;
+  }
+  return set;
+}
+
+// Continues the sequence from whatever in-store codes already exist.
+function nextInternalBarcode(used, extraTaken) {
+  let seq = 1;
+  for (const code in used) {
+    if (/^20\d{11}$/.test(code)) {
+      const n = parseInt(code.slice(2, 12), 10);
+      if (!isNaN(n) && n >= seq) seq = n + 1;
+    }
+  }
+  for (let guard = 0; guard < 200000; guard++) {
+    const data = "20" + String(seq).padStart(10, "0");
+    const code = data + ean13CheckDigit(data);
+    if (!used[code] && !(extraTaken && extraTaken[code])) return code;
+    seq++;
+  }
+  return null;
+}
+
+function generateBarcodeForForm() {
+  const used = usedBarcodeSet();
+  // Don't count the code this product already has as a clash with itself.
+  const current = String(state.newBarcode || "").trim();
+  if (current) delete used[current];
+  const code = nextInternalBarcode(used, null);
+  if (!code) return;
+  state.newBarcode = code;
+  render();
+  const el = document.getElementById("newBarcode");
+  if (el) el.focus();
+}
+
+async function generateMissingBarcodes() {
+  const targets = state.products.filter(p => !String(p.barcode || "").trim());
+  if (targets.length === 0) { showToast(t("allHaveCodes")); return; }
+
+  const used = usedBarcodeSet();
+  const assigned = {};
+  let done = 0, firstErr = null;
+
+  for (let i = 0; i < targets.length; i++) {
+    const code = nextInternalBarcode(used, assigned);
+    if (!code) break;
+    assigned[code] = true;
+    used[code] = true;
+    try {
+      await updateDoc(doc(db, "stock_products", targets[i].id), { barcode: code, updatedAt: Date.now() });
+      done++;
+    } catch (err) {
+      console.error("barcode assign failed", err);
+      if (!firstErr) firstErr = err;
+    }
+  }
+
+  if (firstErr) showToast(describeError(firstErr));
+  else showToast(t("generatedCodes") + " " + done);
+  render();
+}
+
+function scanBtn(field) {
+  return '<button type="button" class="scan-btn" data-action="scan" data-scan-field="' + field +
+    '" title="' + escapeHtml(t("scanBarcode")) + '" aria-label="' + escapeHtml(t("scanBarcode")) + '">' +
+    icon("scan", 24) + "</button>";
+}
+
+function photosOf(p) {
+  if (!p) return [];
+  if (Array.isArray(p.photos) && p.photos.length) return p.photos;
+  return p.photo ? [p.photo] : [];
+}
+
+function catSlug(cat) {
+  return "cat-" + String(cat || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+const ICONS = {
+  box: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/><polyline points="3.29,7 12,12 20.71,7"/><line x1="12" y1="22" x2="12" y2="12"/>',
+  up: '<polyline points="4,17 10,11 14,15 20,7"/><polyline points="14,7 20,7 20,13"/>',
+  down: '<polyline points="4,7 10,13 14,9 20,17"/><polyline points="14,17 20,17 20,11"/>',
+  history: '<path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/>',
+  search: '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  alert: '<polygon points="12,3 22,20 2,20"/><line x1="12" y1="9" x2="12" y2="15"/>',
+  x: '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
+  trash: '<polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  pencil: '<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  inbox: '<polyline points="22,12 16,12 14,15 10,15 8,12 2,12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/>',
+  camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/><circle cx="12" cy="13" r="3.5"/>',
+  tag: '<path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.42 0l8.58-8.58a1 1 0 0 0 0-1.42Z"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>',
+  pin: '<path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/>',
+  barcode: '<line x1="3" y1="5" x2="3" y2="19"/><line x1="6" y1="5" x2="6" y2="19"/><line x1="9" y1="5" x2="9" y2="19"/><line x1="13" y1="5" x2="13" y2="19"/><line x1="16" y1="5" x2="16" y2="19"/><line x1="20" y1="5" x2="20" y2="19"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>',
+  check: '<polyline points="4,12 9,17 20,6"/>',
+  sortDesc: '<line x1="4" y1="6" x2="16" y2="6"/><line x1="4" y1="12" x2="12" y2="12"/><line x1="4" y1="18" x2="8" y2="18"/>',
+  sortAsc: '<line x1="4" y1="6" x2="8" y2="6"/><line x1="4" y1="12" x2="12" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/>',
+  printer: '<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7"/>',
+  scan: '<path d="M4 8V6a2 2 0 0 1 2-2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M20 16v2a2 2 0 0 1-2 2h-2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><line x1="8" y1="9" x2="8" y2="15"/><line x1="11" y1="9" x2="11" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/><line x1="16.5" y1="9" x2="16.5" y2="15"/>',
+  chevronLeft: '<polyline points="15,4 7,12 15,20"/>',
+  chevronRight: '<polyline points="9,4 17,12 9,20"/>',
+  copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,9 12,4 17,9"/><line x1="12" y1="4" x2="12" y2="16"/>',
+};
+function icon(name, size, extraClass) {
+  return '<svg class="' + (extraClass || '') + '" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
+}
+
+const state = {
+  products: [],
+  transactions: [],
+  productsLoaded: false,
+  transactionsLoaded: false,
+  tab: "home",
+  categoryFilter: "All",
+  search: "",
+  historyFilter: "all",
+  historySearch: "",
+  historySort: "desc",
+  returnTab: "overview",
+  editingProductId: null,
+  deleteQuery: "",
+  deleteSelected: {},
+  deleteConfirming: false,
+  deleteError: "",
+  deleteBusy: false,
+  inMode: "single",
+  outMode: "single",
+  importFor: null,
+  importRows: [],
+  importFilter: "all",
+  importFileName: "",
+  importParsing: false,
+  importApplying: false,
+  importError: "",
+  modalError: "",
+  inProductId: "",
+  inSearch: "",
+  inQty: "",
+  inNote: "",
+  inError: "",
+  outProductId: "",
+  outSearch: "",
+  outQty: "",
+  outNote: "",
+  outError: "",
+  newName: "",
+  newCategory: CATEGORIES[0],
+  newStock: "",
+  newThreshold: "5",
+  newPhotos: [],
+  newProductId: "",
+  newBarcode: "",
+  newPrice: "",
+  newLocation: "",
+  photoProcessing: false,
+  labelSelected: {},
+  labelCopies: "1",
+  labelSize: "50x30",
+  labelTarget: "roll",
+  labelSearch: "",
+  lightboxProductId: null,
+  lightboxIndex: 0,
+  theme: "dark",
+  lang: "kh",
+};
+
+function escapeHtml(str) {
+  const d = document.createElement("div");
+  d.textContent = str === null || str === undefined ? "" : String(str);
+  return d.innerHTML;
+}
+
+function formatDate(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  return d.toLocaleDateString(localeTag(), { day: "2-digit", month: "short", year: "numeric" }) +
+    " \u00b7 " + d.toLocaleTimeString(localeTag(), { hour: "2-digit", minute: "2-digit" });
+}
+
+function describeError(err) {
+  const code = err && err.code ? String(err.code) : "";
+  if (code.indexOf("permission-denied") !== -1) {
+    return t("errPermission");
+  }
+  if (code.indexOf("unauthenticated") !== -1) {
+    return t("errUnauth");
+  }
+  if (code) {
+    return t("errCodePrefix") + code + t("errCodeSuffix");
+  }
+  return t("errSaveGeneric");
+}
+
+function formatRelativeTime(ts) {
+  if (!ts) return "";
+  const diff = Date.now() - ts;
+  const min = 60000, hr = 3600000, day = 86400000;
+  if (diff < min) return t("justNow");
+  if (diff < hr) return Math.floor(diff / min) + t("minAgo");
+  if (diff < day) return Math.floor(diff / hr) + t("hrAgo");
+  if (diff < day * 30) return Math.floor(diff / day) + t("dayAgo");
+  const d = new Date(ts);
+  return d.toLocaleDateString(localeTag(), { day: "2-digit", month: "short" });
+}
+
+function calcResizedDimensions(width, height, maxDim) {
+  if (width <= maxDim && height <= maxDim) return { width: width, height: height };
+  if (width >= height) {
+    return { width: maxDim, height: Math.max(1, Math.round(height * maxDim / width)) };
+  }
+  return { width: Math.max(1, Math.round(width * maxDim / height)), height: maxDim };
+}
+
+function resizeImageToBase64(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+      reject(new Error("Please choose an image file."));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read that file."));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Could not read that image."));
+      img.onload = () => {
+        try {
+          const size = calcResizedDimensions(img.naturalWidth || img.width, img.naturalHeight || img.height, maxDim);
+          const canvas = document.createElement("canvas");
+          canvas.width = size.width;
+          canvas.height = size.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, size.width, size.height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const MAX_PHOTOS = 6;
+// Firestore caps a document at 1MB. Photos are stored inside the product
+// document, so keep well clear of that ceiling.
+const PHOTO_BUDGET = 700000;
+
+function totalPhotoBytes(list) {
+  let n = 0;
+  for (let i = 0; i < list.length; i++) n += list[i].length;
+  return n;
+}
+
+async function handlePhotoSelect(fileList) {
+  const files = Array.prototype.slice.call(fileList || []);
+  if (!files.length) return;
+  state.photoProcessing = true;
+  state.modalError = "";
+  render();
+
+  for (let i = 0; i < files.length; i++) {
+    if (state.newPhotos.length >= MAX_PHOTOS) {
+      state.modalError = t("maxPhotos").replace("{n}", MAX_PHOTOS);
+      break;
+    }
+    try {
+      const data = await resizeImageToBase64(files[i], 480, 0.72);
+      if (totalPhotoBytes(state.newPhotos) + data.length > PHOTO_BUDGET) {
+        state.modalError = t("photosTooLarge");
+        break;
+      }
+      state.newPhotos.push(data);
+    } catch (err) {
+      console.error(err);
+      state.modalError = err && err.message ? err.message : t("photoFailed");
+      break;
+    }
+  }
+
+  state.photoProcessing = false;
+  render();
+}
+
+function parseIdTerms(raw) {
+  const parts = String(raw || "").split(/[\s,;]+/);
+  const seen = {};
+  const out = [];
+  for (let i = 0; i < parts.length; i++) {
+    const t = parts[i].trim();
+    if (!t) continue;
+    const key = t.toLowerCase();
+    if (seen[key]) continue;
+    seen[key] = true;
+    out.push(t);
+  }
+  return out;
+}
+
+function matchIdTerms(terms) {
+  const matched = [];
+  const seenIds = {};
+  const notFound = [];
+  for (let i = 0; i < terms.length; i++) {
+    const term = terms[i].toLowerCase();
+    const hits = state.products.filter(p =>
+      (p.productId || "").toLowerCase() === term ||
+      (p.barcode || "").toLowerCase() === term
+    );
+    if (hits.length === 0) {
+      notFound.push(terms[i]);
+      continue;
+    }
+    for (let j = 0; j < hits.length; j++) {
+      if (!seenIds[hits[j].id]) {
+        seenIds[hits[j].id] = true;
+        matched.push(hits[j]);
+      }
+    }
+  }
+  return { matched: matched, notFound: notFound };
+}
+
+// ---------------- spreadsheet reading (offline, no CDN) ----------------
+// .xlsx is a ZIP of XML. We read the ZIP central directory ourselves and
+// inflate entries with DecompressionStream, so nothing has to load remotely.
+
+function zipU16(dv, off) { return dv.getUint16(off, true); }
+function zipU32(dv, off) { return dv.getUint32(off, true); }
+
+function openZip(arrayBuffer) {
+  const bytes = new Uint8Array(arrayBuffer);
+  const dv = new DataView(arrayBuffer);
+  let eocd = -1;
+  const lowest = Math.max(0, bytes.length - 66000);
+  for (let i = bytes.length - 22; i >= lowest; i--) {
+    if (zipU32(dv, i) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("That doesn't look like a valid .xlsx file.");
+  const count = zipU16(dv, eocd + 10);
+  const cdOff = zipU32(dv, eocd + 16);
+  if (cdOff === 0xffffffff) throw new Error("This .xlsx is too large to read here. Please save it as CSV instead.");
+  const files = {};
+  let p = cdOff;
+  for (let i = 0; i < count; i++) {
+    if (p + 46 > bytes.length || zipU32(dv, p) !== 0x02014b50) break;
+    const method = zipU16(dv, p + 10);
+    const compSize = zipU32(dv, p + 20);
+    const nameLen = zipU16(dv, p + 28);
+    const extraLen = zipU16(dv, p + 30);
+    const commentLen = zipU16(dv, p + 32);
+    const localOff = zipU32(dv, p + 42);
+    const name = new TextDecoder().decode(bytes.subarray(p + 46, p + 46 + nameLen));
+    files[name] = { method: method, compSize: compSize, localOff: localOff };
+    p += 46 + nameLen + extraLen + commentLen;
+  }
+  return { bytes: bytes, dv: dv, files: files };
+}
+
+async function readZipText(zip, name) {
+  const e = zip.files[name];
+  if (!e) return null;
+  if (zipU32(zip.dv, e.localOff) !== 0x04034b50) throw new Error("This .xlsx file appears to be damaged.");
+  const nameLen = zipU16(zip.dv, e.localOff + 26);
+  const extraLen = zipU16(zip.dv, e.localOff + 28);
+  const start = e.localOff + 30 + nameLen + extraLen;
+  const chunk = zip.bytes.subarray(start, start + e.compSize);
+  if (e.method === 0) return new TextDecoder().decode(chunk);
+  if (e.method !== 8) throw new Error("Unsupported compression inside the .xlsx file.");
+  if (typeof DecompressionStream === "undefined") {
+    throw new Error("This browser can't open .xlsx files. Please save the sheet as CSV instead.");
+  }
+  const stream = new Blob([chunk]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  const buf = await new Response(stream).arrayBuffer();
+  return new TextDecoder().decode(buf);
+}
+
+function colIndexFromRef(ref) {
+  let n = 0;
+  for (let i = 0; i < ref.length; i++) {
+    const c = ref.charCodeAt(i);
+    if (c >= 65 && c <= 90) n = n * 26 + (c - 64);
+    else if (c >= 97 && c <= 122) n = n * 26 + (c - 96);
+    else break;
+  }
+  return n - 1;
+}
+
+function parseSharedStrings(xml) {
+  if (!xml) return [];
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const sis = doc.getElementsByTagName("si");
+  const out = [];
+  for (let i = 0; i < sis.length; i++) {
+    const ts = sis[i].getElementsByTagName("t");
+    let s = "";
+    for (let j = 0; j < ts.length; j++) {
+      if (ts[j].parentNode && ts[j].parentNode.nodeName === "rPh") continue;
+      s += ts[j].textContent;
+    }
+    out.push(s);
+  }
+  return out;
+}
+
+function parseSheetXml(xml, shared) {
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  const rowEls = doc.getElementsByTagName("row");
+  const rows = [];
+  for (let i = 0; i < rowEls.length; i++) {
+    const cells = rowEls[i].getElementsByTagName("c");
+    const arr = [];
+    for (let j = 0; j < cells.length; j++) {
+      const c = cells[j];
+      const ref = c.getAttribute("r") || "";
+      let idx = ref ? colIndexFromRef(ref) : j;
+      if (idx < 0) idx = j;
+      const t = c.getAttribute("t");
+      let val = "";
+      if (t === "inlineStr") {
+        const ts = c.getElementsByTagName("t");
+        for (let k = 0; k < ts.length; k++) val += ts[k].textContent;
+      } else {
+        const v = c.getElementsByTagName("v")[0];
+        const raw = v ? v.textContent : "";
+        if (t === "s") {
+          const si = parseInt(raw, 10);
+          val = (si >= 0 && si < shared.length) ? shared[si] : "";
+        } else {
+          val = raw;
+        }
+      }
+      arr[idx] = val;
+    }
+    rows.push(arr);
+  }
+  return rows;
+}
+
+async function parseXlsx(arrayBuffer) {
+  const zip = openZip(arrayBuffer);
+  let sheetName = null;
+  if (zip.files["xl/worksheets/sheet1.xml"]) {
+    sheetName = "xl/worksheets/sheet1.xml";
+  } else {
+    const names = Object.keys(zip.files)
+      .filter(n => /^xl\/worksheets\/.*\.xml$/.test(n))
+      .sort();
+    sheetName = names[0] || null;
+  }
+  if (!sheetName) throw new Error("No worksheet found inside that .xlsx file.");
+  const shared = parseSharedStrings(await readZipText(zip, "xl/sharedStrings.xml"));
+  const sheetXml = await readZipText(zip, sheetName);
+  if (!sheetXml) throw new Error("Could not read the worksheet.");
+  return parseSheetXml(sheetXml, shared);
+}
+
+function parseCsv(text) {
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += ch;
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === "," || ch === "\t" || ch === ";") {
+      row.push(field); field = "";
+    } else if (ch === "\n") {
+      row.push(field); rows.push(row); row = []; field = "";
+    } else if (ch !== "\r") {
+      field += ch;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+function readFileAsArrayBuffer(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("Could not read that file."));
+    r.onload = () => resolve(r.result);
+    r.readAsArrayBuffer(file);
+  });
+}
+
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("Could not read that file."));
+    r.onload = () => resolve(r.result);
+    r.readAsText(file);
+  });
+}
+
+async function parseSpreadsheetFile(file) {
+  const name = (file.name || "").toLowerCase();
+  if (name.endsWith(".csv") || name.endsWith(".txt") || name.endsWith(".tsv")) {
+    return parseCsv(await readFileAsText(file));
+  }
+  if (name.endsWith(".xlsx")) {
+    return parseXlsx(await readFileAsArrayBuffer(file));
+  }
+  if (name.endsWith(".xls")) {
+    throw new Error("Old .xls files aren't supported. Save as .xlsx or .csv and try again.");
+  }
+  return parseXlsx(await readFileAsArrayBuffer(file));
+}
+
+// Turns raw spreadsheet rows into validated import rows.
+// Columns: 1 = product ID or barcode, 2 = quantity, 3 = note (optional).
+function buildImportRows(rawRows, mode) {
+  let start = 0;
+  if (rawRows.length) {
+    const firstQty = Number(String(rawRows[0][1] === undefined ? "" : rawRows[0][1]).trim());
+    if (!(firstQty > 0)) start = 1; // row 1 is a header
+  }
+  const out = [];
+  const runningOut = {};
+  for (let i = start; i < rawRows.length; i++) {
+    const r = rawRows[i] || [];
+    const idRaw = String(r[0] === undefined ? "" : r[0]).trim();
+    const qtyRaw = String(r[1] === undefined ? "" : r[1]).trim();
+    const note = String(r[2] === undefined ? "" : r[2]).trim();
+    if (!idRaw && !qtyRaw) continue;
+
+    const entry = { rowNum: i + 1, idRaw: idRaw, qty: 0, note: note, product: null, ok: false, message: "" };
+    const qtyNum = Number(qtyRaw);
+
+    if (!idRaw) {
+      entry.message = t("impMissingId");
+    } else {
+      const key = idRaw.toLowerCase();
+      entry.product = state.products.find(p =>
+        (p.productId || "").toLowerCase() === key ||
+        (p.barcode || "").toLowerCase() === key
+      ) || null;
+      if (!entry.product) entry.message = t("impNoMatch") + " \u201c" + idRaw + "\u201d";
+    }
+
+    if (!entry.message) {
+      if (!qtyRaw) entry.message = t("impMissingQty");
+      else if (!isFinite(qtyNum) || qtyNum <= 0 || Math.floor(qtyNum) !== qtyNum) {
+        entry.message = t("impWholeNumber");
+      } else {
+        entry.qty = qtyNum;
+      }
+    }
+
+    // For stock out, respect what earlier rows in the same file already took.
+    if (!entry.message && mode === "out") {
+      const used = runningOut[entry.product.id] || 0;
+      const left = entry.product.stock - used;
+      if (entry.qty > left) {
+        entry.message = used > 0
+          ? t("impOnly") + " " + left + " " + t("impOnlyLeftAfter")
+          : t("impOnly") + " " + entry.product.stock + " " + t("inStock");
+      } else {
+        runningOut[entry.product.id] = used + entry.qty;
+      }
+    }
+
+    entry.ok = !entry.message;
+    out.push(entry);
+  }
+  return out;
+}
+
+// ---------------- language ----------------
+// IMPORTANT: category values stay English in Firestore. Only labels translate,
+// so switching language never rewrites stored data.
+const I18N = {
+  en: {
+    appSub: "Stock Control",
+    loading: "Loading stock\u2026",
+    setupTitle: "Firebase setup needed",
+    tabOverview: "Overview", tabIn: "Stock In", tabOut: "Stock Out",
+    tabHistory: "History", tabDelete: "Delete", tabDuplicates: "Duplicates", tabLabels: "Labels",
+    labelsTitle: "Print Barcode Labels",
+    generateBarcode: "Generate a code",
+    generateBarcodeHint: "for products with no supplier barcode.",
+    generateFor: "Generate codes for",
+    generatedCodes: "Generated codes for",
+    allHaveCodes: "Every product already has a code.",
+    labelCopies: "Copies of each label",
+    labelSizeLabel: "Label size",
+    printTarget: "Printing to",
+    targetRoll: "Label printer (roll)",
+    targetSheet: "Sticker sheet (A4)",
+    rollHint: "One label per page, sized to match the roll. Set the same size in the printer driver.",
+    sheetHint: "Labels are tiled onto the page with cut lines.",
+    printLabels: "Print",
+    labelNoCode: "No barcode or product ID",
+    labelSkipped: "skipped (no code to print):",
+    labelPickSome: "Select products on the left to build a label sheet.",
+    labelCount: "labels ready",
+    selectAll: "Select all", clearSelection: "Clear",
+    dupIdSection: "Duplicate Product IDs",
+    dupBarcodeSection: "Duplicate Barcodes",
+    dupLocationSection: "Shared Locations",
+    dupLocationNote: "Not a problem \u2014 just products stored in the same place.",
+    dupNoneTitle: "No duplicates found",
+    dupNoneSub: "Every product ID and barcode is unique.",
+    dupNoneIds: "No duplicate product IDs.",
+    dupNoneBarcodes: "No duplicate barcodes.",
+    dupNoneLocations: "No shared locations.",
+    dupItems: "products share this",
+    dupCheckWord: "Check",
+    all: "All",
+    allCategories: "All",
+    addProduct: "Add Product", editProduct: "Edit Product",
+    searchProducts: "Search name, ID, or barcode\u2026",
+    noProductsTitle: "No products yet",
+    noProductsSub: "Add your first product to start tracking stock.",
+    noMatch: "No products match your search.",
+    inStock: "in stock", reorderAt: "reorder at", updated: "updated", low: "Low",
+    stockInTitle: "Stock In \u2014 Supplier Delivery",
+    stockOutTitle: "Stock Out \u2014 Customer Sale",
+    addProductFirst: "Add a product first.", addOneNow: "Add one now",
+    modeSingle: "One item", modeImport: "From file",
+    product: "Product", quantity: "Quantity",
+    supplierNote: "Supplier / note (optional)", customerNote: "Customer / note (optional)",
+    supplierEg: "e.g. ABC Trading", customerEg: "e.g. Mr. Dara",
+    addStock: "Add Stock", removeStock: "Remove Stock",
+    pickerSearch: "Search or scan name, ID, barcode\u2026",
+    pickStartHint: "Search or scan a product to begin.",
+    noProductMatchesThat: "No product matches that.",
+    change: "Change", noId: "no ID",
+    moreKeepTyping: "more \u2014 keep typing to narrow it down.",
+    currentlyInStock: "currently in stock",
+    chooseFile: "Choose a file", fileTypes: ".xlsx or .csv \u00b7 tap to browse",
+    readingFile: "Reading file\u2026",
+    columnOrder: "Column order:",
+    fileExampleTitle: "Your file should look like this",
+    fileExampleNote: "Column headings are optional \u2014 only the order matters.",
+    colId: "Product ID or barcode", colQty: "Quantity", colNote: "Note (optional)",
+    headerSkipped: "A header row is skipped automatically.",
+    downloadTemplate: "Download a template",
+    ready: "ready", skipped: "skipped", recheck: "Recheck", allWord: "All",
+    fixRecheckFirst: "Fix the Recheck rows first",
+    showingFirst: "Showing the first 200 of", rowsWord: "rows.",
+    nothingToApply: "Nothing to apply", applying: "Applying\u2026",
+    addStockForRows: "Add stock for", removeStockForRows: "Remove stock for",
+    rowOne: "row", rowMany: "rows",
+    noDataRows: "No data rows found. Column 1 should be the product ID or barcode, column 2 the quantity.",
+    noActivityTitle: "No activity yet",
+    noActivitySub: "Stock in and out transactions will appear here.",
+    searchHistory: "Search product, ID, barcode, or note\u2026",
+    sortNewest: "Newest first", sortOldest: "Oldest first",
+    noMatchingActivity: "No matching activity.",
+    netWord: "net", recordOne: "record", recordMany: "records",
+    inWord: "in", outWord: "out",
+    deleteTitle: "Delete Products",
+    deleteIdsLabel: "Product IDs or barcodes",
+    deleteIdsPlaceholder: "e.g. 9500001, 9500002",
+    deleteBrowseHint: "Tap a product to select it for deletion.",
+    deleteIdsHint: "Paste IDs to select several at once, or just tap products on the right.",
+    nothingToDeleteTitle: "Nothing to delete yet",
+    nothingToDeleteSub: "Enter one or more Product IDs or barcodes above. Separate them with commas, spaces, or new lines.",
+    notFoundLabel: "not found:", noMatchingProducts: "No matching products.",
+    foundOf: "Found", ofWord: "of", tapRowToToggle: "tap a row to include or exclude it",
+    selectAtLeastOne: "Select at least one product",
+    deleteSelected: "Delete", selectedWord: "selected",
+    permanentlyDelete: "Permanently delete", productOne: "product", productMany: "products",
+    cannotBeUndone: "This cannot be undone. Stock history stays in the History tab.",
+    cancel: "Cancel", yesDelete: "Yes, delete", deleting: "Deleting\u2026",
+    close: "Close",
+    scanBarcode: "Scan barcode",
+    scanMany: "Scan many",
+    hwScanTitle: "Ready for your scanner",
+    hwScanHint: "Point a USB or Bluetooth barcode scanner here \u2014 or type a code and press Enter.",
+    hwScanPlaceholder: "Scan or type a code, then Enter",
+    scanItems: "items",
+    scanCartEmpty: "Scan a barcode to add the first item.",
+    scanNotFound: "No product with code",
+    scannedNote: "Scanned",
+    scanTitle: "Scan a barcode",
+    scanHint: "Point the camera at the barcode",
+    scanUnsupported: "This browser can't scan barcodes. Try Chrome on Android, or type the code.",
+    scanLoading: "Preparing the scanner\u2026",
+    scanReaderFailed: "Could not load the scanner. Check your internet connection and try again.",
+    scanNoCamera: "No camera available. Check the site is opened over https and try again.",
+    scanDenied: "Camera permission was blocked. Allow camera access for this site, then try again.",
+    scanInsecure: "The camera only works on the live web address. Open the app from your https:// link instead of a downloaded file.",
+    photo: "Photo", photosLabel: "Photos", addPhoto: "Add photo", removePhoto: "Remove photo",
+    mainPhoto: "Main", makeMain: "Set as main photo",
+    mainPhotoHint: "The first photo is used as the product thumbnail. Tap another to make it the main one.",
+    maxPhotos: "Maximum {n} photos.",
+    photosTooLarge: "These photos are too large to store together. Remove one and try again.",
+    photoFailed: "Could not process that image.",
+    processingImage: "Processing image\u2026",
+    name: "Name", category: "Category",
+    productIdLabel: "Product ID", productIdEg: "e.g. HLM-014 (optional)",
+    barcodeLabel: "Barcode", barcodeEg: "Scan or type (optional)",
+    priceLabel: "Price (USD)", locationLabel: "Location", locationEg: "e.g. Shelf A2 (optional)",
+    startingStock: "Starting stock", lowStockAlertAt: "Low stock alert at",
+    nameEg: "e.g. AGV K1 Matte Black M",
+    save: "Save", back: "Back", menuTitle: "Menu",
+    switchToLight: "Switch to light mode", switchToDark: "Switch to dark mode",
+    switchToEnglish: "English", switchToKhmer: "\u1781\u17d2\u1798\u17c2\u179a",
+    errNameRequired: "Product name is required.",
+    errChooseProduct: "Choose a product.",
+    errQtyPositive: "Enter a quantity greater than 0.",
+    errOnly: "Only", errInStock: "in stock.",
+    errSaveGeneric: "Could not save. Check your connection.",
+    errPermission: "Blocked by Firestore security rules \u2014 add a rule allowing read/write on stock_products and stock_transactions.",
+    errUnauth: "Firestore rejected this as unauthenticated \u2014 check your security rules.",
+    errCodePrefix: "Could not save (", errCodeSuffix: "). Open the browser console (F12) for details.",
+    toastAdded: "Added", toastUpdated: "Updated", toastDeleted: "Deleted",
+    toastStockedIn: "Stocked in", toastStockedOut: "Stocked out",
+    initialStock: "Initial stock", importedFrom: "Imported from",
+    impMissingId: "Missing product ID", impMissingQty: "Missing quantity",
+    impNoMatch: "No product matches", impWholeNumber: "Quantity must be a whole number above 0",
+    impOnlyLeftAfter: "left after earlier rows in this file", impOnly: "Only",
+    appliedOf: "Applied", rowsOf: "rows.",
+    justNow: "just now", minAgo: "m ago", hrAgo: "h ago", dayAgo: "d ago",
+  },
+  kh: {
+    appSub: "គ្រប់គ្រងស្តុក",
+    loading: "កំពុងផ្ទុកស្តុក…",
+    setupTitle: "ត្រូវការដំឡើង Firebase",
+    tabOverview: "ទិដ្ឋភាពរួម",
+    tabIn: "ចូលស្តុក",
+    tabOut: "ចេញស្តុក",
+    tabHistory: "ប្រវត្តិ",
+    tabDelete: "លុប",
+    tabDuplicates: "ស្ទួន",
+    tabLabels: "ស្លាកបាកូដ",
+    labelsTitle: "បោះពុម្ពស្លាកបាកូដ",
+    generateBarcode: "បង្កើតលេខកូដ",
+    generateBarcodeHint: "សម្រាប់ទំនិញដែលគ្មានបាកូដពីអ្នកផ្គត់ផ្គង់។",
+    generateFor: "បង្កើតលេខកូដសម្រាប់",
+    generatedCodes: "បានបង្កើតលេខកូដសម្រាប់",
+    allHaveCodes: "ទំនិញទាំងអស់មានលេខកូដរួចហើយ។",
+    labelCopies: "ចំនួនច្បាប់ក្នុងមួយស្លាក",
+    labelSizeLabel: "ទំហំស្លាក",
+    printTarget: "បោះពុម្ពទៅ",
+    targetRoll: "ម៉ាស៊ីនស្លាក (ក្រាស់)",
+    targetSheet: "សន្លឹកស្ទីគ័រ (A4)",
+    rollHint: "មួយស្លាកក្នុងមួយទំព័រ ត្រូវនឹងទំហំក្រាស់។ សូមកំណត់ទំហំដូចគ្នាក្នុងម៉ាស៊ីនបោះពុម្ព។",
+    sheetHint: "ស្លាកត្រូវបានរៀបលើទំព័រ ជាមួយបន្ទាត់កាត់។",
+    printLabels: "បោះពុម្ព",
+    labelNoCode: "គ្មានបាកូដ ឬលេខសម្គាល់",
+    labelSkipped: "បានរំលង (គ្មានលេខសម្រាប់បោះពុម្ព)៖",
+    labelPickSome: "សូមជ្រើសរើសទំនិញនៅខាងឆ្វេង ដើម្បីបង្កើតសន្លឹកស្លាក។",
+    labelCount: "ស្លាករួចរាល់",
+    selectAll: "ជ្រើសទាំងអស់", clearSelection: "សម្អាត",
+    dupIdSection: "លេខសម្គាល់ទំនិញស្ទួន",
+    dupBarcodeSection: "បាកូដស្ទួន",
+    dupLocationSection: "ទីតាំងដូចគ្នា",
+    dupLocationNote: "មិនមែនជាបញ្ហាទេ — គ្រាន់តែជាទំនិញដាក់នៅកន្លែងតែមួយ។",
+    dupNoneTitle: "រកមិនឃើញទិន្នន័យស្ទួន",
+    dupNoneSub: "លេខសម្គាល់ និងបាកូដទាំងអស់មិនស្ទួនគ្នាទេ។",
+    dupNoneIds: "គ្មានលេខសម្គាល់ស្ទួន។",
+    dupNoneBarcodes: "គ្មានបាកូដស្ទួន។",
+    dupNoneLocations: "គ្មានទីតាំងដូចគ្នា។",
+    dupItems: "ទំនិញប្រើដូចគ្នា",
+    dupCheckWord: "ពិនិត្យ",
+    all: "ទាំងអស់",
+    allCategories: "ទាំងអស់",
+    addProduct: "បន្ថែមទំនិញ",
+    editProduct: "កែសម្រួលទំនិញ",
+    searchProducts: "ស្វែងរកឈ្មោះ លេខសម្គាល់ ឬបាកូដ…",
+    noProductsTitle: "មិនទាន់មានទំនិញ",
+    noProductsSub: "បន្ថែមទំនិញដំបូងរបស់អ្នក ដើម្បីចាប់ផ្តើមតាមដានស្តុក។",
+    noMatch: "មិនមានទំនិញត្រូវនឹងការស្វែងរក។",
+    inStock: "ក្នុងស្តុក",
+    reorderAt: "បញ្ជាទិញនៅ",
+    updated: "ធ្វើបច្ចុប្បន្នភាព",
+    low: "ទាប",
+    stockInTitle: "ចូលស្តុក — ទំនិញពីអ្នកផ្គត់ផ្គង់",
+    stockOutTitle: "ចេញស្តុក — លក់ឲ្យអតិថិជន",
+    addProductFirst: "សូមបន្ថែមទំនិញជាមុនសិន។",
+    addOneNow: "បន្ថែមឥឡូវនេះ",
+    modeSingle: "មួយមុខ",
+    modeImport: "ពីឯកសារ",
+    product: "ទំនិញ",
+    quantity: "បរិមាណ",
+    supplierNote: "អ្នកផ្គត់ផ្គង់ / កំណត់ចំណាំ (ស្រេចចិត្ត)",
+    customerNote: "អតិថិជន / កំណត់ចំណាំ (ស្រេចចិត្ត)",
+    supplierEg: "ឧ. ABC Trading",
+    customerEg: "ឧ. លោក ដារ៉ា",
+    addStock: "បន្ថែមស្តុក",
+    removeStock: "ដកស្តុក",
+    pickerSearch: "ស្វែងរក ឬស្កែនបាកូដ…",
+    pickStartHint: "ស្វែងរក ឬស្កែនទំនិញ ដើម្បីចាប់ផ្តើម។",
+    noProductMatchesThat: "មិនមានទំនិញត្រូវគ្នា។",
+    change: "ប្តូរ",
+    noId: "គ្មានលេខសម្គាល់",
+    moreKeepTyping: "ទៀត — សូមវាយបន្តដើម្បីស្វែងរកលម្អិត។",
+    currentlyInStock: "មានក្នុងស្តុកបច្ចុប្បន្ន",
+    chooseFile: "ជ្រើសរើសឯកសារ",
+    fileTypes: ".xlsx ឬ .csv · ចុចដើម្បីរក",
+    readingFile: "កំពុងអានឯកសារ…",
+    columnOrder: "លំដាប់ជួរឈរ៖",
+    fileExampleTitle: "ឯកសាររបស់អ្នកគួរមានទម្រង់បែបនេះ",
+    fileExampleNote: "ចំណងជើងជួរឈរជាជម្រើស — សំខាន់តែលំដាប់ប៉ុណ្ណោះ។",
+    colId: "លេខសម្គាល់ទំនិញ ឬបាកូដ",
+    colQty: "បរិមាណ",
+    colNote: "កំណត់ចំណាំ (ស្រេចចិត្ត)",
+    headerSkipped: "ជួរក្បាលត្រូវបានរំលងដោយស្វ័យប្រវត្តិ។",
+    downloadTemplate: "ទាញយកគំរូ",
+    ready: "រួចរាល់",
+    skipped: "បានរំលង",
+    recheck: "ពិនិត្យឡើងវិញ",
+    allWord: "ទាំងអស់",
+    fixRecheckFirst: "សូមកែជួរ Recheck ជាមុនសិន",
+    showingFirst: "បង្ហាញ 200 ដំបូងនៃ",
+    rowsWord: "ជួរ។",
+    nothingToApply: "គ្មានអ្វីដើម្បីអនុវត្ត",
+    applying: "កំពុងអនុវត្ត…",
+    addStockForRows: "បន្ថែមស្តុកសម្រាប់",
+    removeStockForRows: "ដកស្តុកសម្រាប់",
+    rowOne: "ជួរ",
+    rowMany: "ជួរ",
+    noDataRows: "រកមិនឃើញទិន្នន័យ។ ជួរឈរទី ១ គឺលេខសម្គាល់ ឬបាកូដ និងទី ២ គឺបរិមាណ។",
+    noActivityTitle: "មិនទាន់មានសកម្មភាព",
+    noActivitySub: "ប្រតិបត្តិការចូល និងចេញស្តុកនឹងបង្ហាញនៅទីនេះ។",
+    searchHistory: "ស្វែងរកទំនិញ លេខសម្គាល់ ឬកំណត់ចំណាំ…",
+    sortNewest: "ថ្មីមុនគេ",
+    sortOldest: "ចាស់មុនគេ",
+    noMatchingActivity: "មិនមានសកម្មភាពត្រូវគ្នា។",
+    netWord: "សុទ្ធ",
+    recordOne: "កំណត់ត្រា",
+    recordMany: "កំណត់ត្រា",
+    inWord: "ចូល",
+    outWord: "ចេញ",
+    deleteTitle: "លុបទំនិញ",
+    deleteIdsLabel: "លេខសម្គាល់ទំនិញ ឬបាកូដ",
+    deleteIdsPlaceholder: "ឧ. 9500001, 9500002",
+    deleteBrowseHint: "ចុចលើទំនិញ ដើម្បីជ្រើសរើសសម្រាប់លុប។",
+    deleteIdsHint: "បញ្ចូលលេខសម្គាល់ ដើម្បីជ្រើសច្រើនក្នុងពេលតែមួយ ឬចុចលើទំនិញនៅខាងស្តាំ។",
+    nothingToDeleteTitle: "មិនទាន់មានអ្វីលុប",
+    nothingToDeleteSub: "បញ្ចូលលេខសម្គាល់ បាកូដមួយឬច្រើនខាងលើ បំបែកដោយសញ្ញាក្បៀស ដកឃ្លា ឬចុះបន្ទាត់ថ្មី",
+    notFoundLabel: "រកមិនឃើញ៖",
+    noMatchingProducts: "មិនមានទំនិញត្រូវគ្នា។",
+    foundOf: "រកឃើញ",
+    ofWord: "ក្នុងចំណោម",
+    tapRowToToggle: "ចុចជួរដើម្បីបញ្ចូល ឬដកចេញ",
+    selectAtLeastOne: "សូមជ្រើសយ៉ាងហោចមួយទំនិញ",
+    deleteSelected: "លុប",
+    selectedWord: "ដែលបានជ្រើស",
+    permanentlyDelete: "លុបជាអចិន្ត្រៃយ៍",
+    productOne: "ទំនិញ",
+    productMany: "ទំនិញ",
+    cannotBeUndone: "មិនអាចយកមកវិញបានទេ។ ប្រវត្តិស្តុកនៅតែមានក្នុងផ្ទាំងប្រវត្តិ។",
+    cancel: "បោះបង់",
+    yesDelete: "យល់ព្រម លុប",
+    deleting: "កំពុងលុប…",
+    close: "បិទ",
+    scanBarcode: "ស្កែនបាកូដ",
+    scanMany: "ស្កែនច្រើន",
+    hwScanTitle: "រួចរាល់សម្រាប់ម៉ាស៊ីនស្កែន",
+    hwScanHint: "ដាក់ម៉ាស៊ីនស្កែនបាកូដ USB ឬ Bluetooth នៅទីនេះ — ឬវាយបញ្ចូលលេខ រួចចុច Enter។",
+    hwScanPlaceholder: "ស្កែន ឬវាយបញ្ចូលលេខ រួចចុច Enter",
+    scanItems: "មុខ",
+    scanCartEmpty: "ស្កែនបាកូដ ដើម្បីបន្ថែមទំនិញដំបូង។",
+    scanNotFound: "គ្មានទំនិញដែលមានលេខ",
+    scannedNote: "ស្កែន",
+    scanTitle: "ស្កែនបាកូដ",
+    scanHint: "តម្រង់កាមេរ៉ាទៅលើបាកូដ",
+    scanUnsupported: "កម្មវិធីរុករកនេះមិនអាចស្កែនបាកូដបានទេ។ សូមប្រើ Chrome លើ Android ឬវាយលេខដោយដៃ។",
+    scanLoading: "កំពុងរៀបចំម៉ាស៊ីនស្កែន…",
+    scanReaderFailed: "មិនអាចផ្ទុកម៉ាស៊ីនស្កែនបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត រួចព្យាយាមម្តងទៀត។",
+    scanNoCamera: "រកមិនឃើញកាមេរ៉ា។ សូមពិនិត្យថាគេហទំព័របើកតាម https រួចព្យាយាមម្តងទៀត។",
+    scanDenied: "កាមេរ៉ាត្រូវបានបិទ។ សូមអនុញ្ញាតឲ្យប្រើកាមេរ៉ាសម្រាប់គេហទំព័រនេះ រួចព្យាយាមម្តងទៀត។",
+    scanInsecure: "កាមេរ៉ាដំណើរការតែលើអាសយដ្ឋានគេហទំព័រពិតប្រាកដប៉ុណ្ណោះ។ សូមបើកកម្មវិធីតាមតំណ https:// ជំនួសឯកសារដែលបានទាញយក។",
+    photo: "រូបភាព",
+    photosLabel: "រូបភាព",
+    addPhoto: "បន្ថែមរូប",
+    removePhoto: "លុបរូប",
+    mainPhoto: "រូបចម្បង",
+    makeMain: "កំណត់ជារូបចម្បង",
+    mainPhotoHint: "រូបទី១ ត្រូវប្រើជារូបតំណាងទំនិញ។ ចុចរូបផ្សេង ដើម្បីប្តូរជារូបចម្បង។",
+    maxPhotos: "អតិបរមា {n} រូប។",
+    photosTooLarge: "រូបភាពទាំងនេះធំពេកមិនអាចរក្សាទុករួមគ្នាបានទេ។ សូមលុបចេញមួយ រួចព្យាយាមម្តងទៀត។",
+    photoFailed: "មិនអាចដំណើរការរូបភាពនេះបានទេ។",
+    processingImage: "កំពុងដំណើរការរូបភាព…",
+    name: "ឈ្មោះ",
+    category: "ប្រភេទ",
+    productIdLabel: "លេខសម្គាល់ទំនិញ",
+    productIdEg: "ឧ. HLM-014 (ស្រេចចិត្ត)",
+    barcodeLabel: "បាកូដ",
+    barcodeEg: "ស្កែនបាកូដអីវ៉ាន់",
+    priceLabel: "តម្លៃ (ដុល្លារ)",
+    locationLabel: "ទីតាំង",
+    locationEg: "ឧ. Shelf A2 (ស្រេចចិត្ត)",
+    startingStock: "ស្តុកចាប់ផ្តើម",
+    lowStockAlertAt: "ជូនដំណឹងស្តុកតិចនៅ",
+    nameEg: "ឧ. AGV K1 Matte Black M",
+    save: "រក្សាទុក",
+    back: "ត្រឡប់",
+    menuTitle: "ម៉ឺនុយ",
+    switchToLight: "ប្តូរទៅមុខងារភ្លឺ",
+    switchToDark: "ប្តូរទៅមុខងារងងឹត",
+    switchToEnglish: "English",
+    switchToKhmer: "ខ្មែរ",
+    errNameRequired: "ត្រូវបញ្ចូលឈ្មោះទំនិញ។",
+    errChooseProduct: "សូមជ្រើសរើសទំនិញ។",
+    errQtyPositive: "សូមបញ្ចូលបរិមាណធំជាង 0។",
+    errOnly: "មានតែ",
+    errInStock: "ក្នុងស្តុក។",
+    errSaveGeneric: "មិនអាចរក្សាទុកបានទេ។ សូមពិនិត្យអ៊ីនធឺណិត។",
+    errPermission: "ត្រូវបានទប់ស្កាត់ដោយច្បាប់សុវត្ថិភាព Firestore — សូមបន្ថែមច្បាប់អនុញ្ញាត read/write លើ stock_products និង stock_transactions។",
+    errUnauth: "Firestore បានបដិសេធការស្នើសុំនេះ — សូមពិនិត្យច្បាប់សុវត្ថិភាព។",
+    errCodePrefix: "មិនអាចរក្សាទុកបាន (",
+    errCodeSuffix: ")។ សូមមើល console ក្នុងកម្មវិធីរុករក (F12)។",
+    toastAdded: "បានបន្ថែម",
+    toastUpdated: "បានធ្វើបច្ចុប្បន្នភាព",
+    toastDeleted: "បានលុប",
+    toastStockedIn: "បានចូលស្តុក",
+    toastStockedOut: "បានចេញស្តុក",
+    initialStock: "ស្តុកដើម",
+    importedFrom: "នាំចូលពី",
+    impMissingId: "ខ្វះលេខសម្គាល់ទំនិញ",
+    impMissingQty: "ខ្វះបរិមាណ",
+    impNoMatch: "មិនមានទំនិញត្រូវនឹង",
+    impWholeNumber: "បរិមាណត្រូវតែជាចំនួនគត់ធំជាង 0",
+    impOnlyLeftAfter: "នៅសល់បន្ទាប់ពីជួរមុនក្នុងឯកសារនេះ",
+    impOnly: "មានតែ",
+    appliedOf: "បានអនុវត្ត",
+    rowsOf: "ជួរ។",
+    justNow: "អម្បាញ់មិញ",
+    minAgo: " នាទីមុន",
+    hrAgo: " ម៉ោងមុន",
+    dayAgo: " ថ្ងៃមុន",
+  },
+};
+
+function t(key) {
+  const dict = I18N[state.lang] || I18N.en;
+  const v = dict[key];
+  if (v !== undefined) return v;
+  const fb = I18N.en[key];
+  return fb !== undefined ? fb : key;
+}
+
+const SYS_NOTE_INITIAL = "Initial stock";
+const SYS_NOTE_IMPORT_PREFIX = "Imported from ";
+const SYS_NOTE_SCAN = "Scanned";
+
+// System-generated notes are stored in English so they never depend on the
+// language the entry was made in. User-typed notes pass through untouched.
+function displayNote(note) {
+  if (!note) return "";
+  if (note === SYS_NOTE_INITIAL) return t("initialStock");
+  if (note === SYS_NOTE_SCAN) return t("scannedNote");
+  if (note.indexOf(SYS_NOTE_IMPORT_PREFIX) === 0) {
+    return t("importedFrom") + " " + note.slice(SYS_NOTE_IMPORT_PREFIX.length);
+  }
+  return note;
+}
+
+function catLabel(cat) {
+  if (state.lang === "kh") {
+    const kh = CATEGORY_LABELS[cat];
+    if (kh) return kh;
+  }
+  return cat;
+}
+
+function localeTag() { return state.lang === "kh" ? "km-KH" : "en-GB"; }
+
+function lowStockCount() {
+  return state.products.filter(p => p.stock <= p.threshold).length;
+}
+
+// ---------------- render ----------------
+
+function render() {
+  const appEl = document.getElementById("app");
+  const active = document.activeElement;
+  let focusId = null, selStart = null, selEnd = null;
+  if (active && appEl.contains(active) && active.id) {
+    focusId = active.id;
+    if (typeof active.selectionStart === "number") {
+      selStart = active.selectionStart;
+      selEnd = active.selectionEnd;
+    }
+  }
+  appEl.innerHTML = renderAppHTML();
+  if (focusId) {
+    const el = document.getElementById(focusId);
+    if (el) {
+      el.focus();
+      if (selStart !== null && typeof el.setSelectionRange === "function") {
+        try { el.setSelectionRange(selStart, selEnd); } catch (err) { /* not a text field */ }
+      }
+    }
+  }
+  scrollActiveTabIntoView(appEl);
+  syncPrintPageStyle();
+}
+
+// The tab strip scrolls sideways on narrow screens, so the selected tab can end
+// up off-screen. Nudge the strip just far enough to reveal it.
+function scrollActiveTabIntoView(appEl) {
+  try {
+    const tabsEl = appEl.querySelector(".tabs");
+    if (!tabsEl) return;
+    const activeEl = tabsEl.querySelector(".tab-btn.active");
+    if (!activeEl || !tabsEl.clientWidth) return;
+    const pad = 12;
+    const left = activeEl.offsetLeft;
+    const right = left + activeEl.offsetWidth;
+    const viewLeft = tabsEl.scrollLeft;
+    const viewRight = viewLeft + tabsEl.clientWidth;
+    if (left < viewLeft) {
+      tabsEl.scrollLeft = Math.max(0, left - pad);
+    } else if (right > viewRight) {
+      tabsEl.scrollLeft = right - tabsEl.clientWidth + pad;
+    }
+  } catch (err) { /* layout not measurable */ }
+}
+
+function renderAppHTML() {
+  if (FIREBASE_NOT_CONFIGURED) {
+    return (
+      '<div class="setup-notice">' +
+        "<h2>" + t("setupTitle") + "</h2>" +
+        "<p>Open this file and paste your Firebase config near the top of the &lt;script&gt; tag \u2014 the same one from your index.html or manage.html if you want this synced with your existing nija-helmets project.</p>" +
+      "</div>"
+    );
+  }
+  if (!state.productsLoaded || !state.transactionsLoaded) {
+    return '<div class="loading"><span class="spinner"></span> ' + t("loading") + '</div>';
+  }
+  let body = "";
+  if (state.tab === "home") body = renderLauncher();
+  else if (state.tab === "overview") body = renderOverview();
+  else if (state.tab === "in") body = renderStockForm("in");
+  else if (state.tab === "out") body = renderStockForm("out");
+  else if (state.tab === "history") body = renderHistory();
+  else if (state.tab === "delete") body = renderDeleteTab();
+  else if (state.tab === "duplicates") body = renderDuplicatesTab();
+  else if (state.tab === "labels") body = renderLabelsTab();
+  else if (state.tab === "product-form") body = renderProductForm();
+
+  return (
+    '<div class="shell">' +
+      renderHeader() +
+      '<div class="content">' + body + "</div>" +
+    "</div>" +
+    (state.lightboxProductId ? renderLightbox() : "")
+  );
+}
+
+function renderHeader() {
+  // Overview keeps the logo and app name (no "Overview" title), and moves the
+  // category filter and Add Product button up into the header's top-right, so
+  // its search bar sits at the same spot as the home page's search bar.
+  if (state.tab === "overview") {
+    return (
+      '<div class="header">' +
+        '<div class="brand">' +
+          '<div class="brand-left">' +
+            '<button type="button" class="back-btn" data-action="set-tab" data-tab="home" title="' + escapeHtml(t("back")) + '" aria-label="' + escapeHtml(t("back")) + '">' + icon("chevronLeft", 20) + "</button>" +
+            '<div class="brand-mark">' + icon("box", 18) + "</div>" +
+            '<div class="brand-text">' +
+              "<h1>NIJA Helmets</h1>" +
+              t("appSub") +
+            "</div>" +
+          "</div>" +
+          '<div class="header-btns">' +
+            renderCategoryFilterSelect() +
+            '<button type="button" class="btn btn-primary header-add" data-action="open-add-modal">' + icon("plus", 13) + '<span class="btn-label">' + t("addProduct") + "</span></button>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+  // Stock In / Stock Out show their full titled heading (with the arrow icon)
+  // in the header instead of a short menu name.
+  if (state.tab === "in" || state.tab === "out") {
+    const isIn = state.tab === "in";
+    return (
+      '<div class="header">' +
+        '<div class="brand">' +
+          '<div class="brand-left">' +
+            '<button type="button" class="back-btn" data-action="set-tab" data-tab="home" title="' + escapeHtml(t("back")) + '" aria-label="' + escapeHtml(t("back")) + '">' + icon("chevronLeft", 20) + "</button>" +
+            icon(isIn ? "up" : "down", 20, isIn ? "icon-up" : "icon-down") +
+            '<h1 class="section-title">' + escapeHtml(isIn ? t("stockInTitle") : t("stockOutTitle")) + "</h1>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+  // Other section pages: back button + the menu's coloured icon + a title.
+  // Labels and Delete use their fuller in-page title; the rest use the menu name.
+  if (state.tab !== "home") {
+    const found = getMenuTabs().find(x => x.id === state.tab);
+    let title = found ? found.label : "";
+    let ic = found ? found.icon : "box";
+    const color = found ? found.fg : "var(--text)";
+    if (state.tab === "labels") title = t("labelsTitle");
+    else if (state.tab === "delete") title = t("deleteTitle");
+    else if (state.tab === "product-form") { title = state.editingProductId ? t("editProduct") : t("addProduct"); ic = "box"; }
+    const backTo = state.tab === "product-form" ? "overview" : "home";
+    return (
+      '<div class="header">' +
+        '<div class="brand">' +
+          '<div class="brand-left">' +
+            '<button type="button" class="back-btn" data-action="set-tab" data-tab="' + backTo + '" title="' + escapeHtml(t("back")) + '" aria-label="' + escapeHtml(t("back")) + '">' + icon("chevronLeft", 20) + "</button>" +
+            '<span class="section-ic" style="color:' + color + '">' + icon(ic, 20) + "</span>" +
+            '<h1 class="section-title">' + escapeHtml(title) + "</h1>" +
+          "</div>" +
+          (state.tab === "product-form" && state.editingProductId
+            ? '<div class="header-btns"><button type="button" class="theme-btn hist-btn" data-action="view-product-history" title="' + escapeHtml(t("tabHistory")) + '" aria-label="' + escapeHtml(t("tabHistory")) + '">' + icon("history", 18) + "</button></div>"
+            : "") +
+        "</div>" +
+      "</div>"
+    );
+  }
+  return (
+    '<div class="header">' +
+      '<div class="brand">' +
+        '<div class="brand-left">' +
+          '<div class="brand-mark">' + icon("box", 18) + "</div>" +
+          '<div class="brand-text">' +
+            "<h1>NIJA Helmets</h1>" +
+            t("appSub") +
+          "</div>" +
+        "</div>" +
+        '<div class="header-btns">' +
+        '<button type="button" class="theme-btn lang-btn" data-action="toggle-lang" title="' + escapeHtml(state.lang === "kh" ? "Switch to English" : "\u1794\u17d2\u178a\u17bc\u179a\u1791\u17c5\u1797\u17b6\u179f\u17b6\u1781\u17d2\u1798\u17c2\u179a") + '">' +
+          (state.lang === "kh" ? "EN" : "\u1781\u17d2\u1798\u17c2\u179a") +
+        "</button>" +
+        '<button type="button" class="theme-btn" data-action="toggle-theme" title="' + escapeHtml(state.theme === "dark" ? t("switchToLight") : t("switchToDark")) + '">' +
+          icon(state.theme === "dark" ? "sun" : "moon", 16) +
+        "</button>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
+  );
+}
+
+function getMenuTabs() {
+  return [
+    { id: "overview", label: t("tabOverview"), icon: "box", bg: "#dbe7fb", fg: "#2563eb" },
+    { id: "in", label: t("tabIn"), icon: "up", bg: "#d7f0e0", fg: "#16a34a" },
+    { id: "out", label: t("tabOut"), icon: "down", bg: "#fbdada", fg: "#ef4444" },
+    { id: "history", label: t("tabHistory"), icon: "history", bg: "#fcecc4", fg: "#d97706" },
+    { id: "duplicates", label: t("tabDuplicates"), icon: "copy", bg: "#e7dcf9", fg: "#9333ea" },
+    { id: "labels", label: t("tabLabels"), icon: "tag", bg: "#d2eef0", fg: "#0d9488" },
+    { id: "delete", label: t("tabDelete"), icon: "trash", bg: "#f9dbe9", fg: "#db2777" },
+  ];
+}
+
+// Home screen: a grid of menu tiles. Tapping one opens that section as its own
+// page (the tiles are hidden and a back button returns here).
+function renderLauncher() {
+  const tabs = getMenuTabs();
+  const low = lowStockCount();
+  const dupCount = duplicateIssueCount();
+  return (
+    '<div class="launcher">' +
+      '<div class="search-wrap launcher-search">' +
+        '<span class="search-icon">' + icon("search", 15) + "</span>" +
+        '<input id="search" data-field="search" value="' + escapeHtml(state.search) + '" placeholder="' + escapeHtml(t("searchProducts")) + '" class="input input-search input-scan" autocomplete="off" />' +
+        scanBtn("search") +
+      "</div>" +
+      '<div class="launcher-grid">' +
+        tabs.map(tb =>
+          '<button type="button" class="launch-tile" data-action="set-tab" data-tab="' + tb.id + '" style="--tile-bg:' + tb.bg + ';--tile-fg:' + tb.fg + '">' +
+            '<span class="launch-ic">' + icon(tb.icon, 34) +
+              (tb.id === "overview" && low > 0 ? '<span class="tab-badge">' + low + "</span>" : "") +
+              (tb.id === "duplicates" && dupCount > 0 ? '<span class="tab-badge">' + dupCount + "</span>" : "") +
+            "</span>" +
+            '<span class="launch-label">' + tb.label + "</span>" +
+          "</button>"
+        ).join("") +
+      "</div>" +
+    "</div>"
+  );
+}
+
+function renderOverview() {
+  const filtered = state.products
+    .filter(p => state.categoryFilter === "All" || p.category === state.categoryFilter)
+    .filter(p => {
+      const q = state.search.toLowerCase();
+      if (!q) return true;
+      return p.name.toLowerCase().includes(q) ||
+        (p.productId || "").toLowerCase().includes(q) ||
+        (p.barcode || "").toLowerCase().includes(q);
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  let listHtml;
+  if (state.products.length === 0) {
+    listHtml = renderEmptyState();
+  } else if (filtered.length === 0) {
+    listHtml = '<div class="empty-inline">' + t("noMatch") + "</div>";
+  } else {
+    listHtml = '<div class="product-list">' + filtered.map(renderProductRow).join("") + "</div>";
+  }
+
+  return (
+    '<div class="search-wrap search-wrap-overview">' +
+      '<span class="search-icon">' + icon("search", 15) + "</span>" +
+      '<input id="search" data-field="search" value="' + escapeHtml(state.search) + '" placeholder="' + escapeHtml(t("searchProducts")) + '" class="input input-search input-scan" />' +
+      scanBtn("search") +
+    "</div>" +
+    listHtml
+  );
+}
+
+// The category dropdown ("All (4)") lives in the Overview header now, so it is
+// built here and reused there. Counts come from the full product list.
+function renderCategoryFilterSelect() {
+  const counts = {};
+  for (let i = 0; i < state.products.length; i++) {
+    const cat = state.products[i].category;
+    counts[cat] = (counts[cat] || 0) + 1;
+  }
+  const extraCats = [];
+  for (const cat in counts) {
+    if (CATEGORIES.indexOf(cat) === -1 && extraCats.indexOf(cat) === -1) extraCats.push(cat);
+  }
+  extraCats.sort();
+  return (
+    '<select id="categoryFilter" data-field="categoryFilter" class="input cat-select header-filter">' +
+      ["All"].concat(CATEGORIES, extraCats).map(c => {
+        const n = c === "All" ? state.products.length : (counts[c] || 0);
+        return '<option value="' + c + '"' + (state.categoryFilter === c ? " selected" : "") + ">" +
+          escapeHtml(c === "All" ? t("allCategories") : catLabel(c)) + " (" + n + ")" +
+        "</option>";
+      }).join("") +
+    "</select>"
+  );
+}
+
+function renderLightbox() {
+  const p = state.products.find(x => x.id === state.lightboxProductId);
+  if (!p) return "";
+  const pics = photosOf(p);
+  if (!pics.length) return "";
+  const i = Math.min(Math.max(state.lightboxIndex, 0), pics.length - 1);
+  const many = pics.length > 1;
+
+  const strip = many
+    ? '<div class="lb-strip">' + pics.map((src, n) =>
+        '<button type="button" class="lb-thumb' + (n === i ? " lb-thumb-on" : "") + '" data-action="lightbox-pick" data-index="' + n + '">' +
+          '<img src="' + src + '" alt="" />' +
+        "</button>").join("") + "</div>"
+    : "";
+
+  return (
+    '<div class="lb-overlay" data-action="close-lightbox">' +
+      '<div class="lb-bar">' +
+        '<span class="lb-title">' + escapeHtml(p.name) + "</span>" +
+        '<button type="button" class="lb-close" data-action="close-lightbox" title="' + escapeHtml(t("close")) + '">' + icon("x", 18) + "</button>" +
+      "</div>" +
+      '<div class="lb-stage">' +
+        (many ? '<button type="button" class="lb-nav lb-prev" data-action="lightbox-prev">' + icon("chevronLeft", 22) + "</button>" : "") +
+        '<img class="lb-img" src="' + pics[i] + '" alt="" />' +
+        (many ? '<button type="button" class="lb-nav lb-next" data-action="lightbox-next">' + icon("chevronRight", 22) + "</button>" : "") +
+      "</div>" +
+      (many ? '<div class="lb-counter">' + (i + 1) + " / " + pics.length + "</div>" : "") +
+      strip +
+    "</div>"
+  );
+}
+
+function renderProductRow(p) {
+  const low = p.stock <= p.threshold;
+  const updated = formatRelativeTime(p.updatedAt || p.createdAt);
+  const pics = photosOf(p);
+  const thumb = pics.length
+    ? '<button type="button" class="row-thumb-btn" data-action="open-lightbox" data-id="' + p.id + '">' +
+        '<img class="row-thumb" src="' + pics[0] + '" alt="" />' +
+      "</button>"
+    : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
+  return (
+    '<div class="product-row">' +
+      thumb +
+      '<div class="product-info">' +
+        '<div class="product-name-row">' +
+          '<span class="product-name" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</span>" +
+          '<span class="cat-tag ' + catSlug(p.category) + '">' + escapeHtml(catLabel(p.category)) + "</span>" +
+          (low ? '<span class="low-flag">' + icon("alert", 12) + " " + t("low") + "</span>" : "") +
+        "</div>" +
+        '<div class="product-meta">' + t("reorderAt") + " " + p.threshold +
+          (updated ? " \u00b7 " + t("updated") + " " + updated : "") +
+        "</div>" +
+      "</div>" +
+      '<div class="row-stock">' +
+        '<div class="row-stock-num' + (low ? " low" : "") + '">' + p.stock + "</div>" +
+        '<div class="row-stock-label">' + t("inStock") + "</div>" +
+      "</div>" +
+      '<div class="row-actions">' +
+        '<button type="button" class="icon-btn icon-btn-up" title="Stock in" data-action="quick-in" data-id="' + p.id + '">' + icon("up", 14) + "</button>" +
+        '<button type="button" class="icon-btn icon-btn-down" title="Stock out" data-action="quick-out" data-id="' + p.id + '">' + icon("down", 14) + "</button>" +
+        '<button type="button" class="icon-btn" title="Edit" data-action="open-edit-modal" data-id="' + p.id + '">' + icon("pencil", 14) + "</button>" +
+      "</div>" +
+      (p.location || p.barcode ?
+        '<div class="product-extra">' +
+          (p.location ? '<span class="extra-item"><span class="extra-ico">' + icon("pin", 12) + '</span><span class="extra-text">' + escapeHtml(p.location) + "</span></span>" : "") +
+          (p.barcode ? '<span class="extra-item extra-barcode"><span class="extra-ico">' + icon("barcode", 12) + '</span><span class="extra-text">' + escapeHtml(p.barcode) + "</span></span>" : "") +
+        "</div>" : ""
+      ) +
+    "</div>"
+  );
+}
+
+function renderEmptyState() {
+  return (
+    '<div class="empty-state">' +
+      icon("inbox", 30) +
+      '<p class="empty-title">' + t("noProductsTitle") + "</p>" +
+      '<p class="empty-sub">' + t("noProductsSub") + "</p>" +
+      '<button type="button" class="btn btn-primary" data-action="open-add-modal">' + icon("plus", 13) + " " + t("addProduct") + "</button>" +
+    "</div>"
+  );
+}
+
+function renderStockForm(mode) {
+  const isIn = mode === "in";
+  const productId = isIn ? state.inProductId : state.outProductId;
+  const qty = isIn ? state.inQty : state.outQty;
+  const note = isIn ? state.inNote : state.outNote;
+  const error = isIn ? state.inError : state.outError;
+  const selected = state.products.find(p => p.id === productId);
+  const sorted = state.products.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const subMode = isIn ? state.inMode : state.outMode;
+
+  // The title (icon + "Stock In/Out — ...") now lives in the page header, so
+  // the form itself starts straight at the One item / From file / Scan toggle.
+  const heading = "";
+
+  if (state.products.length === 0) {
+    return heading + '<p class="muted">' + t("addProductFirst") + ' <button type="button" class="link-btn" data-action="open-add-modal">' + t("addOneNow") + "</button></p>";
+  }
+
+  const modeToggle =
+    '<div class="filter-row">' +
+      '<button type="button" class="chip' + (subMode === "single" ? " chip-active" : "") + '" data-action="set-stock-mode" data-mode="' + mode + '" data-sub="single">' + t("modeSingle") + "</button>" +
+      '<button type="button" class="chip' + (subMode === "import" ? " chip-active" : "") + '" data-action="set-stock-mode" data-mode="' + mode + '" data-sub="import">' + t("modeImport") + "</button>" +
+      '<button type="button" class="chip chip-scan" data-action="start-scan-session" data-mode="' + mode + '">' +
+        icon("scan", 14) + " " + t("scanMany") +
+      "</button>" +
+    "</div>";
+
+  if (subMode === "import") {
+    return heading + modeToggle + '<div class="import-page">' + renderImportPanel(mode) + "</div>";
+  }
+
+  const options = '<option value="">Select a product\u2026</option>' + sorted.map(p =>
+    '<option value="' + p.id + '"' + (p.id === productId ? " selected" : "") + ">" + escapeHtml(p.name) + " (" + escapeHtml(p.category) + ") \u2014 " + p.stock + " in stock</option>"
+  ).join("");
+
+  return (
+    heading + modeToggle +
+    '<form class="stock-form" data-action="submit-stock-' + mode + '">' +
+      '<div class="form-col form-col-main">' +
+        renderProductPicker(mode, selected, sorted) +
+      "</div>" +
+      '<div class="form-col form-col-side">' +
+      '<div class="form-group">' +
+        '<label for="' + mode + 'Qty">' + t("quantity") + "</label>" +
+        '<input type="text" inputmode="numeric" pattern="[0-9]*" id="' + mode + 'Qty" data-field="' + mode + 'Qty" value="' + escapeHtml(qty) + '" placeholder="0" class="input" />' +
+        (selected && !isIn ? '<p class="hint">' + selected.stock + " " + t("currentlyInStock") + "</p>" : "") +
+      "</div>" +
+      '<div class="form-group">' +
+        '<label for="' + mode + 'Note">' + (isIn ? t("supplierNote") : t("customerNote")) + "</label>" +
+        '<input id="' + mode + 'Note" data-field="' + mode + 'Note" value="' + escapeHtml(note) + '" placeholder="' + escapeHtml(isIn ? t("supplierEg") : t("customerEg")) + '" class="input" />' +
+      "</div>" +
+      (error ? '<p class="form-error">' + escapeHtml(error) + "</p>" : "") +
+      '<button type="submit" class="submit-btn ' + (isIn ? "submit-in" : "submit-out") + '">' + (isIn ? t("addStock") : t("removeStock")) + "</button>" +
+      "</div>" +
+    "</form>"
+  );
+}
+
+function renderProductPicker(mode, selected, sorted) {
+  const searchVal = mode === "in" ? state.inSearch : state.outSearch;
+
+  if (selected) {
+    const thumb = selected.photo
+      ? '<img class="row-thumb" src="' + selected.photo + '" alt="" />'
+      : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
+    return (
+      '<div class="form-group">' +
+        "<label>" + t("product") + "</label>" +
+        '<div class="picked-row">' +
+          thumb +
+          '<div class="picked-info">' +
+            '<div class="picked-name">' + escapeHtml(selected.name) + "</div>" +
+            '<div class="picked-meta">' + selected.stock + " " + t("inStock") + "" +
+              (selected.productId ? " \u00b7 " + escapeHtml(selected.productId) : "") +
+            "</div>" +
+          "</div>" +
+          '<button type="button" class="link-btn" data-action="clear-stock-product" data-mode="' + mode + '">' + t("change") + "</button>" +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  const q = searchVal.trim().toLowerCase();
+  const matches = sorted.filter(p =>
+    !q ||
+    p.name.toLowerCase().includes(q) ||
+    (p.productId || "").toLowerCase().includes(q) ||
+    (p.barcode || "").toLowerCase().includes(q)
+  );
+  const shown = matches.slice(0, 8);
+
+  const list = shown.map(p => {
+    const thumb = p.photo
+      ? '<img class="row-thumb" src="' + p.photo + '" alt="" />'
+      : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
+    return (
+      '<button type="button" class="pick-row" data-action="select-stock-product" data-mode="' + mode + '" data-id="' + p.id + '">' +
+        thumb +
+        '<span class="pick-info">' +
+          '<span class="pick-name">' + escapeHtml(p.name) + "</span>" +
+          '<span class="pick-meta">' +
+            (p.productId ? escapeHtml(p.productId) : t("noId")) +
+            (p.barcode ? " \u00b7 " + escapeHtml(p.barcode) : "") +
+          "</span>" +
+        "</span>" +
+        '<span class="pick-stock' + (p.stock <= p.threshold ? " low" : "") + '">' + p.stock + "</span>" +
+      "</button>"
+    );
+  }).join("");
+
+  return (
+    '<div class="form-group">' +
+      '<label for="' + mode + 'Search">' + t("product") + "</label>" +
+      '<div class="search-wrap pick-search">' +
+        '<span class="search-icon">' + icon("search", 15) + "</span>" +
+        '<input id="' + mode + 'Search" data-field="' + mode + 'Search" value="' + escapeHtml(searchVal) +
+          '" placeholder="' + escapeHtml(t("pickerSearch")) + '" class="input input-search input-scan" autocomplete="off" />' +
+        scanBtn(mode + "Search") +
+      "</div>" +
+      (!q
+        ? ""
+        : matches.length === 0
+          ? '<p class="hint">' + t("noProductMatchesThat") + "</p>"
+          : '<div class="pick-list">' + list + "</div>" +
+            (matches.length > shown.length
+              ? '<p class="hint">' + (matches.length - shown.length) + " " + t("moreKeepTyping") + "</p>"
+              : "")
+      ) +
+    "</div>"
+  );
+}
+
+function renderImportPanel(mode) {
+  const isIn = mode === "in";
+  const rows = state.importFor === mode ? state.importRows : [];
+  const okRows = rows.filter(r => r.ok);
+  const badRows = rows.filter(r => !r.ok);
+
+  const dropZone =
+    '<label for="importFile" class="import-drop">' +
+      icon("upload", 22) +
+      "<span class=\"import-drop-title\">" + (state.importFileName && state.importFor === mode ? escapeHtml(state.importFileName) : t("chooseFile")) + "</span>" +
+      '<span class="import-drop-sub">' + t("fileTypes") + '</span>' +
+    "</label>" +
+    '<input type="file" accept=".xlsx,.csv,.tsv,.txt" id="importFile" data-mode="' + mode + '" class="photo-file-input" />';
+
+  const legend =
+    '<div class="import-legend">' +
+      '<p class="import-legend-note">' +
+      '<button type="button" class="link-btn" data-action="download-template">' + t("downloadTemplate") + "</button></p>" +
+    "</div>";
+
+  const example =
+    '<div class="imp-example">' +
+      '<p class="imp-example-title">' + t("fileExampleTitle") + "</p>" +
+      '<div class="imp-table">' +
+        '<div class="imp-tr imp-th">' +
+          "<span>" + t("colId") + "</span><span>" + t("colQty") + "</span><span>" + t("colNote") + "</span>" +
+        "</div>" +
+        '<div class="imp-tr"><span>9500001</span><span>10</span><span>ABC Trading</span></div>' +
+        '<div class="imp-tr"><span>8801234567890</span><span>5</span><span class="imp-dim">\u2014</span></div>' +
+        '<div class="imp-tr"><span>9500002</span><span>3</span><span class="imp-dim">\u2014</span></div>' +
+      "</div>" +
+    "</div>";
+
+  const errText = state.importError && state.importFor === mode
+    ? '<p class="form-error">' + escapeHtml(state.importError) + "</p>" : "";
+
+  if (state.importParsing) {
+    return '<div class="split"><div class="split-side">' + dropZone + legend + "</div>" +
+      '<div class="split-main"><div class="empty-inline"><span class="spinner"></span> ' + t("readingFile") + "</div></div></div>";
+  }
+
+  if (rows.length === 0) {
+    return '<div class="split"><div class="split-side">' + dropZone + errText + legend + "</div>" +
+      '<div class="split-main">' + example + "</div></div>";
+  }
+
+  const filter = state.importFilter || "all";
+  const shown = filter === "ok" ? okRows : filter === "bad" ? badRows : rows;
+
+  const rowHtml = shown.slice(0, 200).map(r =>
+    '<div class="imp-row' + (r.ok ? "" : " imp-row-bad") + '">' +
+      '<span class="imp-num">' + r.rowNum + "</span>" +
+      '<span class="imp-info">' +
+        '<span class="imp-name">' + escapeHtml(r.product ? r.product.name : r.idRaw || "(blank)") + "</span>" +
+        '<span class="imp-meta">' +
+          (r.ok
+            ? escapeHtml(r.idRaw) + (r.note ? " \u00b7 " + escapeHtml(r.note) : "")
+            : (r.idRaw ? escapeHtml(r.idRaw) + " \u00b7 " : "") + escapeHtml(r.message))
+        + "</span>" +
+      "</span>" +
+      '<span class="imp-qty' + (r.ok ? (isIn ? " amount-in" : " amount-out") : "") + '">' +
+        (r.ok
+          ? (isIn ? "+" : "-") + r.qty
+          : (r.qty > 0 ? (isIn ? "+" : "-") + r.qty + " " : "") + icon("alert", 14)) +
+      "</span>" +
+    "</div>"
+  ).join("");
+
+  const more = shown.length > 200 ? '<p class="hint">' + t("showingFirst") + " " + shown.length + " " + t("rowsWord") + "</p>" : "";
+
+  return (
+    '<div class="split">' +
+      '<div class="split-side">' + dropZone + legend + "</div>" +
+      '<div class="split-main">' +
+    '<div class="import-summary">' +
+      '<button type="button" class="imp-pill imp-pill-all' + (filter === "all" ? " active" : "") + '" data-action="import-filter" data-filter="all">' + rows.length + " " + t("allWord") + "</button>" +
+      '<button type="button" class="imp-pill imp-pill-ok' + (filter === "ok" ? " active" : "") + '" data-action="import-filter" data-filter="ok">' + okRows.length + " " + t("ready") + "</button>" +
+      (badRows.length ? '<button type="button" class="imp-pill imp-pill-bad' + (filter === "bad" ? " active" : "") + '" data-action="import-filter" data-filter="bad">' + badRows.length + " " + t("recheck") + "</button>" : "") +
+    "</div>" +
+    '<div class="imp-list">' + rowHtml + "</div>" + more +
+    errText +
+    '<button type="button" class="submit-btn ' + (isIn ? "submit-in" : "submit-out") + '"' +
+      (okRows.length === 0 || badRows.length > 0 || state.importApplying ? " disabled" : "") +
+      ' data-action="apply-import">' +
+      (state.importApplying
+        ? t("applying")
+        : badRows.length > 0
+          ? t("fixRecheckFirst")
+          : okRows.length === 0
+            ? t("nothingToApply")
+            : (isIn ? t("addStockForRows") : t("removeStockForRows")) + " " + okRows.length + " " + (okRows.length === 1 ? t("rowOne") : t("rowMany"))) +
+    "</button>" +
+      "</div>" +
+    "</div>"
+  );
+}
+
+// Groups products that share a non-empty value in the given field.
+function findDuplicateGroups(field) {
+  const map = {};
+  for (let i = 0; i < state.products.length; i++) {
+    const p = state.products[i];
+    const raw = String(p[field] === undefined || p[field] === null ? "" : p[field]).trim();
+    if (!raw) continue;
+    const key = raw.toLowerCase();
+    if (!map[key]) map[key] = { value: raw, items: [] };
+    map[key].items.push(p);
+  }
+  const out = [];
+  for (const k in map) if (map[k].items.length > 1) out.push(map[k]);
+  out.sort((a, b) => b.items.length - a.items.length || a.value.localeCompare(b.value));
+  return out;
+}
+
+function duplicateIssueCount() {
+  return findDuplicateGroups("productId").length + findDuplicateGroups("barcode").length;
+}
+
+function renderDupGroup(group, tone) {
+  const items = group.items.map(p =>
+    '<button type="button" class="dup-item" data-action="open-edit-modal" data-id="' + p.id + '">' +
+      (p.photo
+        ? '<img class="row-thumb" src="' + p.photo + '" alt="" />'
+        : '<div class="row-thumb-placeholder">' + icon("camera", 14) + "</div>") +
+      '<span class="dup-item-info">' +
+        '<span class="dup-item-name">' + escapeHtml(p.name) + "</span>" +
+        '<span class="dup-item-meta">' + escapeHtml(catLabel(p.category)) + " \u00b7 " + p.stock + " " + t("inStock") + "</span>" +
+      "</span>" +
+      '<span class="dup-item-edit">' + icon("pencil", 13) + "</span>" +
+    "</button>"
+  ).join("");
+  return (
+    '<div class="dup-group dup-' + tone + '">' +
+      '<div class="dup-value">' +
+        '<span class="dup-value-text">' + escapeHtml(group.value) + "</span>" +
+        '<span class="dup-count">' + group.items.length + " " + t("dupItems") + "</span>" +
+      "</div>" +
+      '<div class="dup-items">' + items + "</div>" +
+    "</div>"
+  );
+}
+
+function renderDupSection(titleKey, iconName, groups, tone, emptyKey) {
+  return (
+    '<div class="dup-section dup-section-' + tone + (groups.length ? "" : " dup-section-empty") + '">' +
+      '<div class="dup-head">' +
+        '<span class="dup-head-icon">' + icon(iconName, 15) + "</span>" +
+        "<h3>" + t(titleKey) + "</h3>" +
+        (groups.length ? '<span class="dup-badge">' + groups.length + "</span>" : "") +
+      "</div>" +
+      (groups.length
+        ? '<div class="dup-groups">' + groups.map(g => renderDupGroup(g, tone)).join("") + "</div>"
+        : '<p class="dup-empty">' + t(emptyKey) + "</p>")
+    + "</div>"
+  );
+}
+
+function renderDuplicatesTab() {
+  const idGroups = findDuplicateGroups("productId");
+  const barcodeGroups = findDuplicateGroups("barcode");
+  const locationGroups = findDuplicateGroups("location");
+
+  if (state.products.length === 0) {
+    return '<div class="empty-state">' + icon("copy", 30) +
+      '<p class="empty-title">' + t("dupNoneTitle") + "</p>" +
+      '<p class="empty-sub">' + t("noProductsSub") + "</p></div>";
+  }
+
+  const clean = idGroups.length === 0 && barcodeGroups.length === 0;
+
+  return (
+    '<div class="dup-page">' +
+      (clean
+        ? '<div class="dup-ok">' + icon("check", 14) + "<span>" + t("dupNoneSub") + "</span></div>"
+        : "") +
+      '<div class="dup-cols">' +
+        renderDupSection("dupIdSection", "tag", idGroups, "danger", "dupNoneIds") +
+        renderDupSection("dupBarcodeSection", "barcode", barcodeGroups, "warn", "dupNoneBarcodes") +
+        renderDupSection("dupLocationSection", "pin", locationGroups, "info", "dupNoneLocations") +
+      "</div>" +
+      (locationGroups.length ? '<p class="dup-note">' + t("dupLocationNote") + "</p>" : "") +
+    "</div>"
+  );
+}
+
+const LABEL_SIZES = {
+  "40x30": { w: 40, h: 30, name: 7.5, code: 7 },
+  "50x30": { w: 50, h: 30, name: 8.5, code: 8 },
+  "60x40": { w: 60, h: 40, name: 10,  code: 9 },
+  "70x20": { w: 70, h: 20, name: 7.5, code: 7 },
+  "70x40": { w: 70, h: 40, name: 11,  code: 9.5 },
+  "80x50": { w: 80, h: 50, name: 13,  code: 11 },
+};
+
+// A roll printer feeds one label per page, so the page size must match the
+// label exactly. Sticker sheets instead tile many labels onto one A4 page.
+function syncPrintPageStyle() {
+  let el = document.getElementById("print-page-style");
+  if (!el) {
+    el = document.createElement("style");
+    el.id = "print-page-style";
+    document.head.appendChild(el);
+  }
+  const size = LABEL_SIZES[state.labelSize] || LABEL_SIZES["50x30"];
+  if (state.labelTarget === "roll") {
+    el.textContent =
+      "@media print{" +
+        "@page{size:" + size.w + "mm " + size.h + "mm;margin:0;}" +
+        ".label-sheet{display:block!important;gap:0!important;}" +
+        ".lbl{width:" + size.w + "mm!important;height:" + size.h + "mm!important;" +
+          "border:none!important;border-radius:0!important;margin:0!important;" +
+          "page-break-after:always;break-after:page;}" +
+        ".lbl:last-child{page-break-after:auto;break-after:auto;}" +
+      "}";
+  } else {
+    el.textContent = "@media print{@page{size:auto;margin:8mm;}}";
+  }
+}
+
+function renderLabelsTab() {
+  if (state.products.length === 0) {
+    return '<div class="empty-state">' + icon("tag", 30) +
+      '<p class="empty-title">' + t("noProductsTitle") + "</p>" +
+      '<p class="empty-sub">' + t("noProductsSub") + "</p></div>";
+  }
+
+  const q = state.labelSearch.trim().toLowerCase();
+  const listed = state.products
+    .filter(p => !q || p.name.toLowerCase().includes(q) ||
+      (p.productId || "").toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const missingCodes = state.products.filter(p => !String(p.barcode || "").trim()).length;
+  const chosen = state.products.filter(p => state.labelSelected[p.id]);
+  const printable = chosen.filter(p => labelCodeFor(p));
+  const noCode = chosen.filter(p => !labelCodeFor(p));
+  const copies = Math.max(1, Math.min(50, parseInt(state.labelCopies, 10) || 1));
+  const size = LABEL_SIZES[state.labelSize] || LABEL_SIZES.medium;
+
+  const picker = listed.map(p => {
+    const on = !!state.labelSelected[p.id];
+    const code = labelCodeFor(p);
+    return (
+      '<button type="button" class="del-row' + (on ? " del-row-on" : "") + '" data-action="toggle-label-select" data-id="' + p.id + '">' +
+        '<span class="del-check' + (on ? " on" : "") + '">' + (on ? icon("check", 12) : "") + "</span>" +
+        '<span class="del-info">' +
+          '<span class="del-name">' + escapeHtml(p.name) + "</span>" +
+          '<span class="del-meta">' + (code ? escapeHtml(code) : '<span class="lbl-warn">' + t("labelNoCode") + "</span>") + "</span>" +
+        "</span>" +
+      "</button>"
+    );
+  }).join("");
+
+  // Build the sheet: one label per copy, per selected product.
+  let sheet = "";
+  for (let i = 0; i < printable.length; i++) {
+    const p = printable[i];
+    const code = labelCodeFor(p);
+    for (let n = 0; n < copies; n++) {
+      sheet +=
+        '<div class="lbl" style="width:' + size.w + "mm;height:" + size.h + 'mm">' +
+          '<div class="lbl-name" style="font-size:' + size.name + 'pt">' + escapeHtml(p.name) + "</div>" +
+          '<div class="lbl-bc">' + barcodeSvg(code, "100%", 40) + "</div>" +
+          '<div class="lbl-code" style="font-size:' + size.code + 'pt">' + escapeHtml(code) + "</div>" +
+        "</div>";
+    }
+  }
+  const totalLabels = printable.length * copies;
+
+  const sizeOpts = Object.keys(LABEL_SIZES).map(k =>
+    '<option value="' + k + '"' + (state.labelSize === k ? " selected" : "") + ">" +
+      LABEL_SIZES[k].w + " \u00d7 " + LABEL_SIZES[k].h + " mm" +
+    "</option>").join("");
+
+  const targetOpts = ["roll", "sheet"].map(k =>
+    '<option value="' + k + '"' + (state.labelTarget === k ? " selected" : "") + ">" +
+      t(k === "roll" ? "targetRoll" : "targetSheet") +
+    "</option>").join("");
+
+  return (
+    '<div class="labels-page">' +
+      '<div class="split">' +
+        '<div class="split-side no-print">' +
+          '<div class="form-group">' +
+            '<label for="labelSearch">' + t("product") + "</label>" +
+            '<div class="search-wrap">' +
+              '<span class="search-icon">' + icon("search", 15) + "</span>" +
+              '<input id="labelSearch" data-field="labelSearch" value="' + escapeHtml(state.labelSearch) +
+                '" placeholder="' + escapeHtml(t("searchProducts")) + '" class="input input-search input-scan" autocomplete="off" />' +
+              scanBtn("labelSearch") +
+            "</div>" +
+          "</div>" +
+          '<div class="filter-row">' +
+            '<button type="button" class="chip" data-action="label-select-all">' + t("selectAll") + "</button>" +
+            '<button type="button" class="chip" data-action="label-clear">' + t("clearSelection") + "</button>" +
+          "</div>" +
+          (missingCodes > 0
+            ? '<button type="button" class="btn btn-secondary gen-all" data-action="generate-missing">' +
+                icon("barcode", 14) + " " + t("generateFor") + " " + missingCodes + " " + t("scanItems") +
+              "</button>"
+            : "") +
+          '<div class="del-list lbl-picker">' + picker + "</div>" +
+          '<div class="form-group">' +
+            '<label for="labelCopies">' + t("labelCopies") + "</label>" +
+            '<input type="text" inputmode="numeric" pattern="[0-9]*" id="labelCopies" data-field="labelCopies" value="' + escapeHtml(state.labelCopies) + '" class="input" />' +
+          "</div>" +
+          '<div class="form-group">' +
+            '<label for="labelTarget">' + t("printTarget") + "</label>" +
+            '<select id="labelTarget" data-field="labelTarget" class="input">' + targetOpts + "</select>" +
+          "</div>" +
+          '<div class="form-group">' +
+            '<label for="labelSize">' + t("labelSizeLabel") + "</label>" +
+            '<select id="labelSize" data-field="labelSize" class="input">' + sizeOpts + "</select>" +
+            '<p class="hint">' + t(state.labelTarget === "roll" ? "rollHint" : "sheetHint") + "</p>" +
+          "</div>" +
+        "</div>" +
+        '<div class="split-main">' +
+          (noCode.length
+            ? '<div class="notfound-box no-print">' + icon("alert", 13) +
+                "<div><strong>" + noCode.length + " " + t("labelSkipped") + "</strong> " +
+                escapeHtml(noCode.map(p => p.name).join(", ")) + "</div></div>"
+            : "") +
+          (totalLabels === 0
+            ? '<div class="empty-inline no-print">' + t("labelPickSome") + "</div>"
+            : '<div class="lbl-actions no-print">' +
+                '<span class="del-summary">' + totalLabels + " " + t("labelCount") + "</span>" +
+                '<button type="button" class="btn btn-primary" data-action="print-labels">' + icon("printer", 14) + " " + t("printLabels") + "</button>" +
+              "</div>" +
+              '<div class="label-sheet">' + sheet + "</div>") +
+        "</div>" +
+      "</div>" +
+    "</div>"
+  );
+}
+
+function renderDeleteTab() {
+  const terms = parseIdTerms(state.deleteQuery);
+  const result = matchIdTerms(terms);
+  const browsing = terms.length === 0;
+
+  // Products are chosen by typing or scanning their IDs/barcodes, so the list
+  // only ever shows what was matched -- there's no default catalog to browse.
+  const list = result.matched;
+  const selected = state.products.filter(p => state.deleteSelected[p.id]);
+
+  const notFoundBox = (!browsing && result.notFound.length)
+    ? '<div class="notfound-box">' + icon("alert", 13) +
+        "<div><strong>" + result.notFound.length + " " + t("notFoundLabel") + "</strong> " +
+        escapeHtml(result.notFound.join(", ")) + "</div>" +
+      "</div>"
+    : "";
+
+  const actions = state.deleteConfirming
+    ? '<div class="danger-zone">' +
+        "<p><strong>" + t("permanentlyDelete") + " " + selected.length + " " +
+        (selected.length === 1 ? t("productOne") : t("productMany")) + "?</strong> " + t("cannotBeUndone") + "</p>" +
+        '<div class="page-actions">' +
+          '<button type="button" class="btn btn-secondary" data-action="cancel-bulk-delete">' + t("cancel") + "</button>" +
+          '<button type="button" class="btn btn-danger"' + (state.deleteBusy ? " disabled" : "") + ' data-action="confirm-bulk-delete">' +
+            (state.deleteBusy ? t("deleting") : t("yesDelete")) +
+          "</button>" +
+        "</div>" +
+      "</div>"
+    : '<button type="button" class="btn btn-danger del-submit"' + (selected.length === 0 ? " disabled" : "") + ' data-action="ask-bulk-delete">' +
+        (selected.length === 0 ? t("selectAtLeastOne") : t("deleteSelected") + " " + selected.length + " " + t("selectedWord")) +
+      "</button>";
+
+  let body;
+  if (state.products.length === 0) {
+    body = '<div class="empty-state">' + icon("trash", 30) +
+      '<p class="empty-title">' + t("noProductsTitle") + "</p>" +
+      '<p class="empty-sub">' + t("noProductsSub") + "</p></div>";
+  } else if (browsing) {
+    // Nothing entered yet: no product list, just the (disabled) delete action.
+    body = actions;
+  } else if (list.length === 0) {
+    body = notFoundBox + '<div class="empty-inline">' + t("noMatchingProducts") + "</div>" + actions;
+  } else {
+    const rows = list.map(p => {
+      const checked = !!state.deleteSelected[p.id];
+      const thumb = photosOf(p).length
+        ? '<img class="row-thumb" src="' + photosOf(p)[0] + '" alt="" />'
+        : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
+      return (
+        '<button type="button" class="del-row' + (checked ? " del-row-on" : "") + '" data-action="toggle-delete-select" data-id="' + p.id + '">' +
+          '<span class="del-check' + (checked ? " on" : "") + '">' + (checked ? icon("check", 12) : "") + "</span>" +
+          thumb +
+          '<span class="del-info">' +
+            '<span class="del-name">' + escapeHtml(p.name) + "</span>" +
+            '<span class="del-meta">' +
+              (p.productId ? escapeHtml(p.productId) : t("noId")) +
+              (p.barcode ? " \u00b7 " + escapeHtml(p.barcode) : "") +
+              " \u00b7 " + p.stock + " " + t("inStock") +
+            "</span>" +
+          "</span>" +
+        "</button>"
+      );
+    }).join("");
+
+    const summary = '<p class="del-summary">' + t("foundOf") + " " + result.matched.length + " " + t("ofWord") + " " + terms.length +
+      " \u00b7 " + t("tapRowToToggle") + "</p>";
+
+    body = notFoundBox + summary +
+      '<div class="del-list">' + rows + "</div>" +
+      (state.deleteError ? '<p class="form-error">' + escapeHtml(state.deleteError) + "</p>" : "") +
+      actions;
+  }
+
+  return (
+    '<div class="delete-page">' +
+      '<div class="form-group">' +
+        '<div class="scan-wrap">' +
+          '<textarea id="deleteQuery" data-field="deleteQuery" class="input del-input input-scan" rows="1" placeholder="' + escapeHtml(t("deleteIdsPlaceholder")) + '">' + escapeHtml(state.deleteQuery) + "</textarea>" +
+          scanBtn("deleteQuery") +
+        "</div>" +
+      "</div>" +
+      body +
+    "</div>"
+  );
+}
+
+function renderHistory() {
+  if (state.transactions.length === 0) {
+    return (
+      '<div class="empty-state">' + icon("history", 30) +
+      '<p class="empty-title">' + t("noActivityTitle") + "</p>" +
+      '<p class="empty-sub">' + t("noActivitySub") + "</p></div>"
+    );
+  }
+
+  // Transactions store the product's document id, so look up the product to let
+  // people search by the Product ID or barcode they actually know.
+  const byDocId = {};
+  for (let i = 0; i < state.products.length; i++) byDocId[state.products[i].id] = state.products[i];
+
+  const q = state.historySearch.trim().toLowerCase();
+  const filtered = state.transactions.filter(t => {
+    if (state.historyFilter !== "all" && t.type !== state.historyFilter) return false;
+    if (!q) return true;
+    const p = byDocId[t.productId];
+    return (t.productName || "").toLowerCase().includes(q) ||
+      (t.note || "").toLowerCase().includes(q) ||
+      displayNote(t.note).toLowerCase().includes(q) ||
+      (p && (p.productId || "").toLowerCase().includes(q)) ||
+      (p && (p.barcode || "").toLowerCase().includes(q));
+  });
+
+  const filters = [["all", t("all")], ["in", t("tabIn")], ["out", t("tabOut")]];
+  const chips = filters.map(f =>
+    '<button type="button" class="chip' + (state.historyFilter === f[0] ? " chip-active" : "") + '" data-action="set-history-filter" data-filter="' + f[0] + '">' + f[1] + "</button>"
+  ).join("") +
+  '<button type="button" class="chip chip-sort" data-action="toggle-history-sort">' +
+    icon(state.historySort === "desc" ? "sortDesc" : "sortAsc", 13) + " " +
+    (state.historySort === "desc" ? t("sortNewest") : t("sortOldest")) +
+  "</button>";
+
+  const search =
+    '<div class="search-wrap">' +
+      '<span class="search-icon">' + icon("search", 15) + "</span>" +
+      '<input id="historySearch" data-field="historySearch" value="' + escapeHtml(state.historySearch) +
+        '" placeholder="' + escapeHtml(t("searchHistory")) + '" class="input input-search input-scan" autocomplete="off" />' +
+      scanBtn("historySearch") +
+    "</div>";
+
+  if (filtered.length === 0) {
+    return '<div class="filter-row">' + chips + "</div>" + search +
+      '<div class="empty-inline">' + t("noMatchingActivity") + "</div>";
+  }
+
+  if (state.historySort === "asc") filtered.reverse();
+
+  let totalIn = 0, totalOut = 0;
+  for (let i = 0; i < filtered.length; i++) {
+    if (filtered[i].type === "in") totalIn += filtered[i].qty;
+    else totalOut += filtered[i].qty;
+  }
+  const net = totalIn - totalOut;
+
+  const summary =
+    '<div class="hist-summary">' +
+      '<span class="imp-pill imp-pill-ok">+' + totalIn + " " + t("inWord") + "</span>" +
+      '<span class="imp-pill imp-pill-bad">-' + totalOut + " " + t("outWord") + "</span>" +
+      '<span class="hist-net">' + t("netWord") + " " + (net >= 0 ? "+" : "") + net + " \u00b7 " + filtered.length + " " + (filtered.length === 1 ? t("recordOne") : t("recordMany")) + "</span>" +
+    "</div>";
+
+  const rows = filtered.map(t =>
+    '<div class="history-row">' +
+      '<div class="history-icon ' + (t.type === "in" ? "history-icon-in" : "history-icon-out") + '">' + icon(t.type === "in" ? "up" : "down", 13) + "</div>" +
+      '<div class="history-info">' +
+        '<div class="history-name">' + escapeHtml(t.productName) + "</div>" +
+        '<div class="history-meta">' + formatDate(t.date) + (t.note ? " \u00b7 " + escapeHtml(displayNote(t.note)) : "") + "</div>" +
+      "</div>" +
+      '<div class="history-amount ' + (t.type === "in" ? "amount-in" : "amount-out") + '">' + (t.type === "in" ? "+" : "-") + t.qty + "</div>" +
+    "</div>"
+  ).join("");
+
+  return '<div class="filter-row">' + chips + "</div>" + search + summary +
+    '<div class="history-list">' + rows + "</div>";
+}
+
+function renderProductForm() {
+  const editing = state.editingProductId ? state.products.find(p => p.id === state.editingProductId) : null;
+  return (
+    '<div class="product-form-page">' +
+      '<div class="form-icon-row">' + icon(editing ? "pencil" : "plus", 16) +
+        "<h2>" + (editing ? t("editProduct") : t("addProduct")) + "</h2>" +
+      "</div>" +
+      '<form data-action="submit-product">' +
+        '<div class="form-col form-col-main">' +
+        '<div class="form-group">' +
+          "<label>" + t("photosLabel") + "</label>" +
+          '<div class="photo-grid">' +
+            state.newPhotos.map((src, i) =>
+              '<div class="photo-cell">' +
+                '<button type="button" class="photo-thumb" data-action="set-main-photo" data-index="' + i + '" title="' + escapeHtml(t("makeMain")) + '">' +
+                  '<img src="' + src + '" alt="" />' +
+                "</button>" +
+                (i === 0 ? '<span class="photo-main-tag">' + t("mainPhoto") + "</span>" : "") +
+                '<button type="button" class="photo-remove" data-action="remove-photo" data-index="' + i + '" title="' + escapeHtml(t("removePhoto")) + '">' + icon("x", 11) + "</button>" +
+              "</div>"
+            ).join("") +
+            (state.newPhotos.length < MAX_PHOTOS
+              ? '<label for="newPhotoInput" class="photo-box photo-add">' + icon("camera", 18) + "<span>" + t("addPhoto") + "</span></label>"
+              : "") +
+          "</div>" +
+          '<input type="file" accept="image/*" multiple id="newPhotoInput" class="photo-file-input" />' +
+          (state.photoProcessing ? '<p class="photo-processing">' + t("processingImage") + "</p>" : "") +
+          (state.newPhotos.length > 1 ? '<p class="hint">' + t("mainPhotoHint") + "</p>" : "") +
+        "</div>" +
+        '<div class="form-group">' +
+          '<label for="newName">' + t("name") + "</label>" +
+          '<input id="newName" data-field="newName" value="' + escapeHtml(state.newName) + '" placeholder="' + escapeHtml(t("nameEg")) + '" class="input" />' +
+        "</div>" +
+        '<div class="form-group">' +
+          '<label for="newCategory">' + t("category") + "</label>" +
+          '<select id="newCategory" data-field="newCategory" class="input">' +
+            CATEGORIES.map(c => '<option value="' + c + '"' + (c === state.newCategory ? " selected" : "") + ">" + catLabel(c) + "</option>").join("") +
+          "</select>" +
+        "</div>" +
+        "</div>" +
+        '<div class="form-col form-col-side">' +
+        '<div class="form-group">' +
+          '<label for="newProductId">' + t("productIdLabel") + "</label>" +
+          '<input id="newProductId" data-field="newProductId" value="' + escapeHtml(state.newProductId) + '" placeholder="' + escapeHtml(t("productIdEg")) + '" class="input" />' +
+        "</div>" +
+        '<div class="form-group">' +
+          '<label for="newBarcode">' + t("barcodeLabel") + "</label>" +
+          '<div class="scan-wrap">' +
+            '<input id="newBarcode" data-field="newBarcode" value="' + escapeHtml(state.newBarcode) + '" placeholder="' + escapeHtml(t("barcodeEg")) + '" class="input input-scan" />' +
+            scanBtn("newBarcode") +
+          "</div>" +
+          '<p class="hint"><button type="button" class="link-btn" data-action="generate-barcode">' + t("generateBarcode") + "</button> " + t("generateBarcodeHint") + "</p>" +
+        "</div>" +
+        '<div class="form-group">' +
+          '<label for="newPrice">' + t("priceLabel") + "</label>" +
+          '<input type="text" inputmode="decimal" id="newPrice" data-field="newPrice" value="' + escapeHtml(state.newPrice) + '" placeholder="0.00" class="input" />' +
+        "</div>" +
+        '<div class="form-group">' +
+          '<label for="newLocation">' + t("locationLabel") + "</label>" +
+          '<input id="newLocation" data-field="newLocation" value="' + escapeHtml(state.newLocation) + '" placeholder="' + escapeHtml(t("locationEg")) + '" class="input" />' +
+        "</div>" +
+        (!editing ?
+          '<div class="form-group">' +
+            '<label for="newStock">' + t("startingStock") + "</label>" +
+            '<input type="text" inputmode="numeric" pattern="[0-9]*" id="newStock" data-field="newStock" value="' + escapeHtml(state.newStock) + '" placeholder="0" class="input" />' +
+          "</div>" : ""
+        ) +
+        '<div class="form-group">' +
+          '<label for="newThreshold">' + t("lowStockAlertAt") + "</label>" +
+          '<input type="text" inputmode="numeric" pattern="[0-9]*" id="newThreshold" data-field="newThreshold" value="' + escapeHtml(state.newThreshold) + '" class="input" />' +
+        "</div>" +
+        "</div>" +
+        (state.modalError ? '<p class="form-error form-span">' + escapeHtml(state.modalError) + "</p>" : "") +
+        '<div class="page-actions form-span">' +
+          '<button type="button" class="btn btn-secondary" data-action="close-modal">' + t("back") + "</button>" +
+          '<button type="submit" class="btn btn-primary"' + (state.photoProcessing ? " disabled" : "") + '>' + t("save") + "</button>" +
+        "</div>" +
+      "</form>" +
+    "</div>"
+  );
+}
+
+// ---------------- toast (outside render cycle) ----------------
+
+let toastTimer = null;
+function showToast(msg) {
+  let el = document.getElementById("toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "toast";
+    el.className = "toast";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  requestAnimationFrame(() => el.classList.add("toast-show"));
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.classList.remove("toast-show"); }, 2400);
+}
+
+// ---------------- actions ----------------
+
+function setTab(tab) { state.tab = tab; render(); }
+
+function openAddModal() {
+  state.returnTab = state.tab;
+  state.editingProductId = null;
+  state.newName = "";
+  state.newCategory = CATEGORIES[0];
+  state.newStock = "";
+  state.newThreshold = "5";
+  state.newPhotos = [];
+  state.newProductId = "";
+  state.newBarcode = "";
+  state.newPrice = "";
+  state.newLocation = "";
+  state.photoProcessing = false;
+  state.modalError = "";
+  state.tab = "product-form";
+  render();
+  const el = document.getElementById("newName");
+  if (el) el.focus();
+}
+
+function openEditModal(id) {
+  const p = state.products.find(p => p.id === id);
+  if (!p) return;
+  state.returnTab = state.tab;
+  state.editingProductId = id;
+  state.newName = p.name;
+  state.newCategory = p.category;
+  state.newStock = "";
+  state.newThreshold = String(p.threshold);
+  state.newPhotos = Array.isArray(p.photos) && p.photos.length ? p.photos.slice() : (p.photo ? [p.photo] : []);
+  state.newProductId = p.productId || "";
+  state.newBarcode = p.barcode || "";
+  state.newPrice = p.price !== undefined && p.price !== null ? String(p.price) : "";
+  state.newLocation = p.location || "";
+  state.photoProcessing = false;
+  state.modalError = "";
+  state.tab = "product-form";
+  render();
+  const el = document.getElementById("newName");
+  if (el) el.focus();
+}
+
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", state.theme);
+  try { localStorage.setItem("nija-stock-theme", state.theme); } catch (e) { /* private browsing */ }
+  render();
+}
+
+// ---------------- barcode scanning ----------------
+// The scanner overlay lives OUTSIDE #app and is managed imperatively: render()
+// replaces #app's innerHTML, which would tear down the <video> and drop the
+// camera stream mid-scan.
+let scanEl = null, scanStream = null, scanTimer = null, scanTarget = null;
+
+// Cameras are only available on a secure origin. Opening the saved .html file
+// directly (file:// or content://) will always fail, no matter the permission.
+function isSecureOrigin() {
+  try {
+    if (window.isSecureContext) return true;
+    const loc = window.location;
+    if (loc.protocol === "https:") return true;
+    return loc.hostname === "localhost" || loc.hostname === "127.0.0.1";
+  } catch (e) {
+    return false;
+  }
+}
+
+// ---------------- barcode reader ----------------
+// Android Chrome has a built-in BarcodeDetector. Safari (iPhone) does not, so
+// there a decoder is fetched on demand and driven off canvas frames. Both
+// paths expose the same detect(video) -> code | null.
+const ZXING_URL = "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/+esm";
+let zxingModule = null;
+let zxingLoader = () => import(/* @vite-ignore */ ZXING_URL);
+
+async function createBarcodeReader() {
+  if (typeof BarcodeDetector !== "undefined") {
+    let formats = null;
+    try { formats = await BarcodeDetector.getSupportedFormats(); } catch (e) { formats = null; }
+    const detector = (formats && formats.length) ? new BarcodeDetector({ formats: formats }) : new BarcodeDetector();
+    return {
+      native: true,
+      detect: async (video) => {
+        const found = await detector.detect(video);
+        return (found && found.length && found[0].rawValue) ? String(found[0].rawValue) : null;
+      },
+    };
+  }
+
+  if (!zxingModule) zxingModule = await zxingLoader();
+  const Z = zxingModule;
+
+  const hints = new Map();
+  try {
+    // iPhone runs this pure-JS decoder, so every hint has a real per-frame
+    // cost. The labels and supplier codes are all linear 1D barcodes, so the
+    // 2D (QR) search and TRY_HARDER's extra rotations/scanlines are pure
+    // overhead -- dropping them is what makes the scan feel near-instant
+    // instead of taking many seconds.
+    hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [
+      Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E,
+      Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.CODE_39, Z.BarcodeFormat.ITF,
+    ]);
+  } catch (e) { /* fall back to defaults */ }
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+  // Core reader path: build the bitmap ourselves rather than relying on any
+  // particular browser-helper method existing in the published build.
+  let core = null;
+  try {
+    if (Z.MultiFormatReader && Z.RGBLuminanceSource && Z.BinaryBitmap && Z.HybridBinarizer) {
+      core = new Z.MultiFormatReader();
+      if (core.setHints) core.setHints(hints);
+    }
+  } catch (e) { core = null; }
+
+  // Older helper as a second option.
+  let helper = null;
+  if (!core && Z.BrowserMultiFormatReader) {
+    try { helper = new Z.BrowserMultiFormatReader(hints); } catch (e) { helper = null; }
+  }
+  if (!core && !helper) throw new Error("No usable decoder in the barcode library");
+
+  const isNotFound = (err) => {
+    if (!err) return true;
+    const n = (err.name || "") + " " + (err.constructor ? err.constructor.name : "") + " " + (err.message || "");
+    return /NotFound|No MultiFormat Readers|not found/i.test(n);
+  };
+
+  let hardErrors = 0;
+  return {
+    native: false,
+    detect: async (video) => {
+      const vw = video.videoWidth, vh = video.videoHeight;
+      if (!vw || !vh) return null;
+
+      // Only the middle of the frame matters -- that is where the aiming box
+      // is. Cropping is both faster and less prone to misreads from whatever
+      // else is in shot.
+      const cropW = Math.max(1, Math.round(vw * 0.86));
+      const cropH = Math.max(1, Math.round(vh * 0.42));
+      const sx = Math.round((vw - cropW) / 2);
+      const sy = Math.round((vh - cropH) / 2);
+
+      // A full 1080p frame is slow to decode on a phone; ~720px across is
+      // plenty for a linear barcode that fills the box, and roughly halves the
+      // per-frame work versus a larger canvas.
+      const scale = Math.min(1, 720 / cropW);
+      const w = Math.max(1, Math.round(cropW * scale));
+      const h = Math.max(1, Math.round(cropH * scale));
+      canvas.width = w;
+      canvas.height = h;
+      ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, w, h);
+
+      try {
+        if (core) {
+          const rgba = ctx.getImageData(0, 0, w, h).data;
+          const gray = new Uint8ClampedArray(w * h);
+          for (let i = 0, j = 0; j < gray.length; i += 4, j++) {
+            gray[j] = (rgba[i] * 0.299 + rgba[i + 1] * 0.587 + rgba[i + 2] * 0.114) | 0;
+          }
+          const source = new Z.RGBLuminanceSource(gray, w, h);
+          const bitmap = new Z.BinaryBitmap(new Z.HybridBinarizer(source));
+          const result = core.decode(bitmap, hints);
+          if (core.reset) core.reset();
+          hardErrors = 0;
+          return result ? String(result.getText()) : null;
+        }
+        const result = helper.decodeFromCanvas(canvas);
+        hardErrors = 0;
+        return result ? String(result.getText()) : null;
+      } catch (err) {
+        if (isNotFound(err)) return null;   // just no barcode in this frame
+        // A genuine fault would otherwise fail silently on every frame.
+        hardErrors++;
+        if (hardErrors === 1) console.error("barcode decode error", err);
+        if (hardErrors > 8) throw err;   // ~2s of real faults, not a transient blip
+        return null;
+      }
+    },
+  };
+}
+
+// ---------------- continuous scan session ----------------
+// A POS-style flow: the camera stays open at the bottom and each scanned item
+// stacks up in the list above. Built outside #app and updated imperatively so
+// a re-render never tears down the live <video>.
+let sessEl = null, sessStream = null, sessTimer = null, sessMode = null;
+let sessCart = [];
+let sessLastCode = null, sessLastAt = 0, sessCodeInView = false, sessAbsentFrames = 0;
+let sessPendingCode = null, sessPendingCount = 0;
+
+function sessProductFor(code) {
+  const key = String(code).trim().toLowerCase();
+  if (!key) return null;
+  return state.products.find(p =>
+    (p.barcode || "").toLowerCase() === key || (p.productId || "").toLowerCase() === key
+  ) || null;
+}
+
+function sessFlash(text, bad) {
+  if (!sessEl) return;
+  const el = sessEl.querySelector(".sess-flash");
+  if (!el) return;
+  el.textContent = text;
+  el.className = "sess-flash" + (bad ? " sess-flash-bad" : " sess-flash-ok");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { if (el) { el.textContent = ""; el.className = "sess-flash"; } }, 1600);
+}
+
+function sessTotal() {
+  return sessCart.reduce((n, r) => n + r.qty, 0);
+}
+
+function renderSessList() {
+  if (!sessEl) return;
+  const listEl = sessEl.querySelector(".sess-list");
+  const footEl = sessEl.querySelector(".sess-foot");
+  if (!listEl || !footEl) return;
+
+  listEl.innerHTML = sessCart.length === 0
+    ? '<div class="sess-empty">' + escapeHtml(t("scanCartEmpty")) + "</div>"
+    : sessCart.map((r, i) =>
+        '<div class="sess-row">' +
+          '<div class="sess-info">' +
+            '<div class="sess-name">' + escapeHtml(r.name) + "</div>" +
+            '<div class="sess-meta">' + escapeHtml(r.code) +
+              (sessMode === "out" ? " \u00b7 " + r.stock + " " + escapeHtml(t("inStock")) : "") +
+            "</div>" +
+          "</div>" +
+          '<div class="sess-qty">' +
+            '<button type="button" class="sess-step" data-sess="dec" data-i="' + i + '">\u2212</button>' +
+            '<span class="sess-num">' + r.qty + "</span>" +
+            '<button type="button" class="sess-step" data-sess="inc" data-i="' + i + '">+</button>' +
+          "</div>" +
+          '<button type="button" class="sess-del" data-sess="del" data-i="' + i + '">' + icon("x", 14) + "</button>" +
+        "</div>"
+      ).join("");
+
+  const n = sessTotal();
+  const label = sessMode === "in" ? t("addStockForRows") : t("removeStockForRows");
+  footEl.innerHTML =
+    '<span class="sess-count">' + n + " " + escapeHtml(t("scanItems")) + "</span>" +
+    '<button type="button" class="btn ' + (sessMode === "in" ? "btn-primary" : "btn-danger") + '" data-sess="apply"' +
+      (n === 0 ? " disabled" : "") + ">" + escapeHtml(label) + "</button>";
+}
+
+function sessAddCode(code) {
+  const now = Date.now();
+  // While the same barcode stays in front of the camera it is one item, not
+  // many. It only counts again once it has actually left the frame.
+  if (code === sessLastCode && now - sessLastAt < 150) return;
+  if (code === sessLastCode && sessCodeInView) return;
+  sessLastCode = code;
+  sessLastAt = now;
+  sessCodeInView = true;
+
+  const p = sessProductFor(code);
+  if (!p) {
+    sessFlash(t("scanNotFound") + " " + code, true);
+    return;
+  }
+  try { if (navigator.vibrate) navigator.vibrate(35); } catch (e) { /* not supported */ }
+
+  const existing = sessCart.find(r => r.id === p.id);
+  if (existing) {
+    if (sessMode === "out" && existing.qty >= p.stock) {
+      sessFlash(t("errOnly") + " " + p.stock + " " + t("inStock"), true);
+      renderSessList();
+      return;
+    }
+    existing.qty += 1;
+    sessFlash(p.name + " \u00d7" + existing.qty, false);
+  } else {
+    if (sessMode === "out" && p.stock < 1) {
+      sessFlash(t("errOnly") + " 0 " + t("inStock"), true);
+      return;
+    }
+    sessCart.unshift({ id: p.id, name: p.name, code: labelCodeFor(p) || code, qty: 1, stock: p.stock });
+    sessFlash(p.name, false);
+  }
+  renderSessList();
+}
+
+function stopScanSession() {
+  if (sessTimer) { clearTimeout(sessTimer); sessTimer = null; }
+  if (sessStream) {
+    sessStream.getTracks().forEach(tr => { try { tr.stop(); } catch (e) { /* already stopped */ } });
+    sessStream = null;
+  }
+  if (sessEl && sessEl.parentNode) sessEl.parentNode.removeChild(sessEl);
+  sessEl = null; sessMode = null; sessCart = [];
+  sessLastCode = null; sessLastAt = 0; sessCodeInView = false; sessAbsentFrames = 0;
+  sessPendingCode = null; sessPendingCount = 0;
+  try { document.body.style.overflow = ""; } catch (e) { /* no body */ }
+}
+
+async function applyScanSession() {
+  if (!sessCart.length || !sessMode) return;
+  const mode = sessMode;
+  const rows = sessCart.slice();
+  const now = Date.now();
+  let applied = 0, firstErr = null;
+
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    const p = state.products.find(x => x.id === r.id);
+    if (!p) continue;
+    const newStock = mode === "in" ? p.stock + r.qty : Math.max(0, p.stock - r.qty);
+    try {
+      await updateDoc(doc(db, "stock_products", p.id), { stock: newStock, updatedAt: now });
+      await addDoc(collection(db, "stock_transactions"), {
+        productId: p.id, productName: p.name, type: mode, qty: r.qty,
+        note: SYS_NOTE_SCAN, date: now,
+      });
+      applied += r.qty;
+    } catch (err) {
+      console.error("scan session apply failed", err);
+      if (!firstErr) firstErr = err;
+    }
+  }
+
+  stopScanSession();
+  if (firstErr) {
+    showToast(describeError(firstErr));
+  } else {
+    showToast((mode === "in" ? t("toastStockedIn") : t("toastStockedOut")) + " " + applied);
+  }
+  render();
+}
+
+async function startScanSession(mode) {
+  if (sessEl) return;
+  sessMode = mode;
+  sessCart = [];
+  sessLastCode = null; sessLastAt = 0; sessCodeInView = false; sessAbsentFrames = 0;
+  sessPendingCode = null; sessPendingCount = 0;
+
+  sessEl = document.createElement("div");
+  sessEl.className = "sess-overlay";
+  sessEl.innerHTML =
+    '<div class="sess-bar">' +
+      '<span class="sess-title">' + escapeHtml(mode === "in" ? t("tabIn") : t("tabOut")) + " \u00b7 " + escapeHtml(t("scanMany")) + "</span>" +
+      '<button type="button" class="lb-close" data-sess="close" aria-label="' + escapeHtml(t("close")) + '">' + icon("x", 18) + "</button>" +
+    "</div>" +
+    '<div class="sess-hw">' +
+      '<input class="sess-hw-input" type="text" inputmode="text" autocomplete="off" ' +
+        'autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" ' +
+        'placeholder="' + escapeHtml(t("hwScanPlaceholder")) + '">' +
+    "</div>" +
+    '<div class="sess-flash"></div>' +
+    '<div class="sess-list"></div>' +
+    '<div class="sess-cam">' +
+      '<video class="sess-video" playsinline muted autoplay></video>' +
+      '<div class="sess-frame"></div>' +
+    "</div>" +
+    '<div class="sess-foot"></div>';
+  document.body.appendChild(sessEl);
+  try { document.body.style.overflow = "hidden"; } catch (e) { /* no body */ }
+
+  sessEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-sess]");
+    if (!btn) return;
+    const act = btn.dataset.sess;
+    if (act === "close") { stopScanSession(); render(); return; }
+    if (act === "apply") { applyScanSession(); return; }
+    const i = parseInt(btn.dataset.i, 10);
+    const row = sessCart[i];
+    if (!row) return;
+    if (act === "inc") {
+      const p = state.products.find(x => x.id === row.id);
+      if (sessMode === "out" && p && row.qty >= p.stock) {
+        sessFlash(t("errOnly") + " " + p.stock + " " + t("inStock"), true);
+      } else row.qty += 1;
+    } else if (act === "dec") {
+      row.qty -= 1;
+      if (row.qty < 1) sessCart.splice(i, 1);
+    } else if (act === "del") {
+      sessCart.splice(i, 1);
+    }
+    renderSessList();
+    focusHwInput();
+  });
+
+  // ----- hardware scanner (USB / Bluetooth "gun") + manual typing -----
+  // A scanner types the barcode into the focused field and sends Enter, so a
+  // kept-focused input is all that is needed -- no camera required. This is the
+  // way to use "Scan many" on a computer.
+  const hwInput = sessEl.querySelector(".sess-hw-input");
+  // Phones use the camera, and auto-focusing here would pop up the on-screen
+  // keyboard, so only grab focus on devices with a real pointer (a computer).
+  const isTouch = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  function focusHwInput() {
+    if (isTouch || !hwInput) return;
+    try { hwInput.focus(); } catch (e) { /* not focusable */ }
+  }
+  if (hwInput) {
+    hwInput.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const code = hwInput.value.trim();
+      hwInput.value = "";
+      if (!code) return;
+      // A deliberate trigger-pull is always a fresh item, so don't let the
+      // camera's "same code still in view" guard swallow a repeat scan.
+      sessCodeInView = false;
+      sessAddCode(code);
+      focusHwInput();
+    });
+    // If focus drifts (e.g. after clicking a button), a click anywhere that
+    // isn't a control brings it back so the next scan still lands.
+    sessEl.addEventListener("click", (e) => {
+      if (!e.target.closest("[data-sess], .sess-hw-input")) focusHwInput();
+    });
+  }
+
+  renderSessList();
+  focusHwInput();
+
+  // The camera is a bonus, not a requirement. When it isn't there (e.g. a
+  // computer with no webcam or with permission blocked), the black panel turns
+  // into a calm "scanner ready" panel and the hardware input carries on.
+  function camUnavailable() {
+    const cam = sessEl && sessEl.querySelector(".sess-cam");
+    if (cam) cam.classList.add("sess-cam-off");
+    focusHwInput();
+  }
+
+  if (!isSecureOrigin() || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camUnavailable(); return; }
+
+  try {
+    sessStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 }, height: { ideal: 720 },
+        focusMode: { ideal: "continuous" },
+      }, audio: false,
+    });
+  } catch (err) {
+    console.error("camera failed", err);
+    camUnavailable();
+    return;
+  }
+  if (!sessEl) { sessStream.getTracks().forEach(tr => tr.stop()); sessStream = null; return; }
+
+  const video = sessEl.querySelector(".sess-video");
+  video.srcObject = sessStream;
+  try { await video.play(); } catch (e) { /* autoplay attribute covers this */ }
+
+  let reader;
+  try {
+    if (typeof BarcodeDetector === "undefined") sessFlash(t("scanLoading"), false);
+    reader = await createBarcodeReader();
+    if (!sessEl) return;
+  } catch (err) {
+    console.error("barcode reader failed to load", err);
+    sessFlash(t("scanReaderFailed"), true);
+    return;
+  }
+
+  // Same rule as the single scanner: confirm a code across a couple of frames
+  // before trusting it, so one bad decode can't add the wrong product. The
+  // check digit ZXing validates makes two reads a safe, fast bar.
+  const needed = 2;
+  let misses = 0;
+
+  const tick = async () => {
+    if (!sessEl) return;
+    try {
+      const code = await reader.detect(video);
+      if (code) {
+        misses = 0;
+        sessAbsentFrames = 0;
+        const trimmed = String(code).trim();
+        if (trimmed === sessPendingCode) sessPendingCount++;
+        else { sessPendingCode = trimmed; sessPendingCount = 1; }
+        if (sessPendingCount >= needed) sessAddCode(trimmed);
+      } else {
+        // The JS decoder often drops a frame between two good reads, so only
+        // forget the pending code after several blank frames -- otherwise it
+        // never reaches the confirmation count and the scan drags on.
+        if (++misses >= 4) { sessPendingCode = null; sessPendingCount = 0; misses = 0; }
+        // A few clear frames in a row means the item really has left the view,
+        // so the same code may be scanned again as a new item.
+        sessAbsentFrames++;
+        if (sessAbsentFrames >= 3) sessCodeInView = false;
+      }
+    } catch (err) {
+      console.error("scanning stopped", err);
+      sessFlash(t("scanReaderFailed"), true);
+      return;
+    }
+    sessTimer = setTimeout(tick, reader.native ? 120 : 60);
+  };
+  sessTimer = setTimeout(tick, 250);
+}
+
+function scanMessage(text) {
+  if (!scanEl) return;
+  const el = scanEl.querySelector(".scan-msg");
+  if (el) el.textContent = text;
+}
+
+function stopScan() {
+  if (scanTimer) { clearTimeout(scanTimer); scanTimer = null; }
+  if (scanStream) {
+    scanStream.getTracks().forEach(tr => { try { tr.stop(); } catch (e) { /* already stopped */ } });
+    scanStream = null;
+  }
+  if (scanEl && scanEl.parentNode) scanEl.parentNode.removeChild(scanEl);
+  scanEl = null;
+  scanTarget = null;
+  try { document.body.style.overflow = ""; } catch (e) { /* no body */ }
+}
+
+function applyScan(field, code) {
+  const value = String(code || "").trim();
+  stopScan();
+  if (!value) return;
+  if (field === "deleteQuery") {
+    // Scanning several items in a row should build a list, not overwrite it.
+    const existing = state.deleteQuery.trim();
+    const already = parseIdTerms(existing).some(t => t.toLowerCase() === value.toLowerCase());
+    applyFieldValue(field, already ? existing : (existing ? existing + ", " + value : value));
+  } else {
+    applyFieldValue(field, value);
+  }
+  render();
+  const el = document.getElementById(field);
+  if (el) el.focus();
+}
+
+async function startScan(field) {
+  if (scanEl) return;
+  scanTarget = field;
+
+  scanEl = document.createElement("div");
+  scanEl.className = "scan-overlay";
+  scanEl.innerHTML =
+    '<div class="scan-bar">' +
+      '<span class="scan-title">' + escapeHtml(t("scanTitle")) + "</span>" +
+      '<button type="button" class="lb-close scan-close" aria-label="' + escapeHtml(t("close")) + '">' + icon("x", 18) + "</button>" +
+    "</div>" +
+    '<div class="scan-stage">' +
+      '<video class="scan-video" playsinline muted autoplay></video>' +
+      '<div class="scan-frame"></div>' +
+    "</div>" +
+    '<p class="scan-msg">' + escapeHtml(t("scanHint")) + "</p>";
+  document.body.appendChild(scanEl);
+  try { document.body.style.overflow = "hidden"; } catch (e) { /* no body */ }
+
+  scanEl.querySelector(".scan-close").addEventListener("click", stopScan);
+  scanEl.addEventListener("click", (e) => { if (e.target === scanEl) stopScan(); });
+
+  if (!isSecureOrigin()) {
+    scanMessage(t("scanInsecure"));
+    return;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    scanMessage(t("scanNoCamera"));
+    return;
+  }
+
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 }, height: { ideal: 720 },
+        focusMode: { ideal: "continuous" },
+      }, audio: false,
+    });
+  } catch (err) {
+    console.error("camera failed", err);
+    scanMessage(err && err.name === "NotAllowedError" ? t("scanDenied") : t("scanNoCamera"));
+    return;
+  }
+  if (!scanEl) { // closed while the permission prompt was up
+    scanStream.getTracks().forEach(tr => tr.stop());
+    scanStream = null;
+    return;
+  }
+
+  const video = scanEl.querySelector(".scan-video");
+  video.srcObject = scanStream;
+  try { await video.play(); } catch (e) { /* autoplay attribute covers this */ }
+
+  let reader;
+  try {
+    if (typeof BarcodeDetector === "undefined") scanMessage(t("scanLoading"));
+    reader = await createBarcodeReader();
+    if (!scanEl) return;
+    scanMessage(t("scanHint"));
+  } catch (err) {
+    console.error("barcode reader failed to load", err);
+    scanMessage(t("scanReaderFailed"));
+    return;
+  }
+
+  // A single frame can decode incorrectly, so a code is only accepted after
+  // the same value has been read more than once. EAN/UPC/Code128 all carry a
+  // check digit that ZXing already validates, so two reads is a safe, fast bar.
+  const needed = 2;
+  let pending = null, pendingCount = 0, misses = 0;
+
+  const tick = async () => {
+    if (!scanEl) return;
+    try {
+      const code = await reader.detect(video);
+      if (code) {
+        misses = 0;
+        if (code === pending) pendingCount++;
+        else { pending = code; pendingCount = 1; }
+        if (pendingCount >= needed) { applyScan(scanTarget, code); return; }
+      } else {
+        // The JS decoder often returns nothing between two good reads; wiping
+        // the count on the first blank frame is what made this take seconds.
+        // Only forget the pending code after several blank frames in a row.
+        if (++misses >= 4) { pending = null; pendingCount = 0; misses = 0; }
+      }
+    } catch (err) {
+      console.error("scanning stopped", err);
+      scanMessage(t("scanReaderFailed"));
+      return;
+    }
+    scanTimer = setTimeout(tick, reader.native ? 120 : 60);
+  };
+  scanTimer = setTimeout(tick, 250);
+}
+
+function openLightbox(id) {
+  const p = state.products.find(x => x.id === id);
+  if (!p || photosOf(p).length === 0) return;
+  state.lightboxProductId = id;
+  state.lightboxIndex = 0;
+  try { document.body.style.overflow = "hidden"; } catch (e) { /* no body yet */ }
+  render();
+}
+
+function closeLightbox() {
+  state.lightboxProductId = null;
+  state.lightboxIndex = 0;
+  try { document.body.style.overflow = ""; } catch (e) { /* no body */ }
+  render();
+}
+
+function stepLightbox(delta) {
+  const p = state.products.find(x => x.id === state.lightboxProductId);
+  if (!p) return;
+  const pics = photosOf(p);
+  if (pics.length < 2) return;
+  state.lightboxIndex = (state.lightboxIndex + delta + pics.length) % pics.length;
+  render();
+}
+
+function toggleLang() {
+  state.lang = state.lang === "kh" ? "en" : "kh";
+  document.documentElement.setAttribute("lang", state.lang === "kh" ? "km" : "en");
+  try { localStorage.setItem("nija-stock-lang", state.lang); } catch (e) { /* private browsing */ }
+  render();
+}
+
+function closeModal() {
+  state.tab = state.returnTab || "overview";
+  state.editingProductId = null;
+  state.modalError = "";
+  render();
+}
+
+async function saveProduct() {
+  const name = state.newName.trim();
+  if (!name) { state.modalError = t("errNameRequired"); render(); return; }
+  const threshold = Math.max(0, parseInt(state.newThreshold, 10) || 0);
+  const priceTrimmed = state.newPrice.trim();
+  const price = priceTrimmed === "" ? null : Math.max(0, parseFloat(priceTrimmed) || 0);
+  const productId = state.newProductId.trim();
+  const barcode = state.newBarcode.trim();
+  const location = state.newLocation.trim();
+  const photos = state.newPhotos.slice();
+  const photo = photos[0] || "";  // first image doubles as the thumbnail everywhere else
+
+  if (state.editingProductId) {
+    try {
+      await updateDoc(doc(db, "stock_products", state.editingProductId), {
+        name: name, category: state.newCategory, threshold: threshold,
+        productId: productId, barcode: barcode, price: price, location: location,
+        photo: photo, photos: photos,
+        updatedAt: Date.now(),
+      });
+      showToast(t("toastUpdated") + " " + name);
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      state.modalError = describeError(err);
+      render();
+    }
+    return;
+  }
+
+  const startStock = Math.max(0, parseInt(state.newStock, 10) || 0);
+  const now = Date.now();
+  try {
+    const ref = await addDoc(collection(db, "stock_products"), {
+      name: name, category: state.newCategory, stock: startStock, threshold: threshold,
+      productId: productId, barcode: barcode, price: price, location: location,
+      photo: photo, photos: photos,
+      createdAt: now, updatedAt: now,
+    });
+    if (startStock > 0) {
+      await addDoc(collection(db, "stock_transactions"), {
+        productId: ref.id, productName: name, type: "in", qty: startStock, note: SYS_NOTE_INITIAL, date: now,
+      });
+    }
+    showToast(t("toastAdded") + " " + name);
+    closeModal();
+  } catch (err) {
+    console.error(err);
+    state.modalError = describeError(err);
+    render();
+  }
+}
+
+function resetImport() {
+  state.importRows = [];
+  state.importFileName = "";
+  state.importError = "";
+  state.importParsing = false;
+  state.importApplying = false;
+}
+
+async function handleImportFile(file, mode) {
+  state.importFor = mode;
+  state.importParsing = true;
+  state.importError = "";
+  state.importRows = [];
+  state.importFilter = "all";
+  state.importFileName = file.name || "file";
+  render();
+  try {
+    const raw = await parseSpreadsheetFile(file);
+    state.importRows = buildImportRows(raw, mode);
+    if (state.importRows.length === 0) {
+      state.importError = t("noDataRows");
+    }
+  } catch (err) {
+    console.error(err);
+    state.importRows = [];
+    state.importError = err && err.message ? err.message : "Could not read that file.";
+  }
+  state.importParsing = false;
+  render();
+}
+
+async function applyImport() {
+  const mode = state.importFor;
+  const valid = state.importRows.filter(r => r.ok);
+  // All-or-nothing: if any row needs a recheck, nothing is applied until the
+  // file is fixed, so a partial import can't slip through.
+  if (state.importRows.some(r => !r.ok)) return;
+  if (valid.length === 0 || (mode !== "in" && mode !== "out")) return;
+
+  state.importApplying = true;
+  state.importError = "";
+  render();
+
+  // One stock write per product, but one history entry per spreadsheet row
+  // so each row's note is preserved.
+  const groups = {};
+  for (let i = 0; i < valid.length; i++) {
+    const r = valid[i];
+    if (!groups[r.product.id]) groups[r.product.id] = { product: r.product, total: 0, rows: [] };
+    groups[r.product.id].total += r.qty;
+    groups[r.product.id].rows.push(r);
+  }
+
+  const now = Date.now();
+  let appliedRows = 0;
+  let firstErr = null;
+  const ids = Object.keys(groups);
+
+  for (let i = 0; i < ids.length; i++) {
+    const g = groups[ids[i]];
+    const newStock = mode === "in" ? g.product.stock + g.total : g.product.stock - g.total;
+    try {
+      await updateDoc(doc(db, "stock_products", g.product.id), { stock: newStock, updatedAt: now });
+    } catch (err) {
+      console.error("import stock update failed for", g.product.id, err);
+      if (!firstErr) firstErr = err;
+      continue; // don't log transactions for a stock change that didn't happen
+    }
+    for (let j = 0; j < g.rows.length; j++) {
+      const r = g.rows[j];
+      try {
+        await addDoc(collection(db, "stock_transactions"), {
+          productId: g.product.id,
+          productName: g.product.name,
+          type: mode,
+          qty: r.qty,
+          note: r.note || (SYS_NOTE_IMPORT_PREFIX + state.importFileName),
+          date: now,
+        });
+        appliedRows++;
+      } catch (err) {
+        console.error("import transaction failed", err);
+        if (!firstErr) firstErr = err;
+      }
+    }
+  }
+
+  state.importApplying = false;
+  if (firstErr) {
+    state.importError = t("appliedOf") + " " + appliedRows + "/" + valid.length + " " + t("rowsOf") + " " + describeError(firstErr);
+  } else {
+    showToast((mode === "in" ? t("toastStockedIn") : t("toastStockedOut")) + " " + appliedRows + " " + (appliedRows === 1 ? t("rowOne") : t("rowMany")));
+    resetImport();
+  }
+  render();
+}
+
+function downloadImportTemplate() {
+  const csv = "Product ID or Barcode,Quantity,Note\n9500001,10,ABC Trading\n9500002,5,\n";
+  try {
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "stock-import-template.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (err) {
+    console.error(err);
+    showToast("Could not create the template file");
+  }
+}
+
+async function performBulkDelete() {
+  const selected = state.products.filter(p => state.deleteSelected[p.id]);
+  if (selected.length === 0) return;
+
+  state.deleteBusy = true;
+  state.deleteError = "";
+  render();
+
+  let done = 0;
+  let firstErr = null;
+  for (let i = 0; i < selected.length; i++) {
+    try {
+      await deleteDoc(doc(db, "stock_products", selected[i].id));
+      done++;
+    } catch (err) {
+      console.error("delete failed for", selected[i].id, err);
+      if (!firstErr) firstErr = err;
+    }
+  }
+
+  state.deleteBusy = false;
+  state.deleteConfirming = false;
+
+  if (firstErr) {
+    state.deleteError = "Deleted " + done + " of " + selected.length + ". " + describeError(firstErr);
+  } else {
+    state.deleteQuery = "";
+    state.deleteSelected = {};
+    showToast(t("toastDeleted") + " " + done + " " + (done === 1 ? t("productOne") : t("productMany")));
+  }
+  render();
+}
+
+async function submitStockIn() {
+  state.inError = "";
+  const product = state.products.find(p => p.id === state.inProductId);
+  const qty = parseInt(state.inQty, 10);
+  if (!product) { state.inError = t("errChooseProduct"); render(); return; }
+  if (!qty || qty <= 0) { state.inError = t("errQtyPositive"); render(); return; }
+  try {
+    await updateDoc(doc(db, "stock_products", product.id), { stock: product.stock + qty, updatedAt: Date.now() });
+    await addDoc(collection(db, "stock_transactions"), {
+      productId: product.id, productName: product.name, type: "in", qty: qty, note: state.inNote.trim(), date: Date.now(),
+    });
+    showToast("+" + qty + " " + product.name);
+    state.inProductId = ""; state.inQty = ""; state.inNote = "";
+    render();
+  } catch (err) {
+    console.error(err);
+    state.inError = describeError(err);
+    render();
+  }
+}
+
+async function submitStockOut() {
+  state.outError = "";
+  const product = state.products.find(p => p.id === state.outProductId);
+  const qty = parseInt(state.outQty, 10);
+  if (!product) { state.outError = t("errChooseProduct"); render(); return; }
+  if (!qty || qty <= 0) { state.outError = t("errQtyPositive"); render(); return; }
+  if (qty > product.stock) { state.outError = t("errOnly") + " " + product.stock + " " + t("errInStock"); render(); return; }
+  try {
+    await updateDoc(doc(db, "stock_products", product.id), { stock: product.stock - qty, updatedAt: Date.now() });
+    await addDoc(collection(db, "stock_transactions"), {
+      productId: product.id, productName: product.name, type: "out", qty: qty, note: state.outNote.trim(), date: Date.now(),
+    });
+    showToast("-" + qty + " " + product.name);
+    state.outProductId = ""; state.outQty = ""; state.outNote = "";
+    render();
+  } catch (err) {
+    console.error(err);
+    state.outError = describeError(err);
+    render();
+  }
+}
+
+// ---------------- event delegation ----------------
+
+const appEl = document.getElementById("app");
+
+appEl.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-action]");
+  if (!el) return;
+  const action = el.dataset.action;
+  if (action === "set-tab") setTab(el.dataset.tab);
+  else if (action === "set-history-filter") { state.historyFilter = el.dataset.filter; render(); }
+  else if (action === "view-product-history") {
+    const p = state.products.find(x => x.id === state.editingProductId);
+    state.historySearch = p ? (p.productId || p.barcode || p.name || "") : "";
+    state.historyFilter = "all";
+    state.tab = "history";
+    render();
+  }
+  else if (action === "toggle-history-sort") {
+    state.historySort = state.historySort === "desc" ? "asc" : "desc";
+    render();
+  }
+  else if (action === "open-add-modal") openAddModal();
+  else if (action === "open-edit-modal") openEditModal(el.dataset.id);
+  else if (action === "close-modal") closeModal();
+  else if (action === "select-stock-product") {
+    const m = el.dataset.mode;
+    if (m === "in") { state.inProductId = el.dataset.id; state.inSearch = ""; state.inError = ""; }
+    else { state.outProductId = el.dataset.id; state.outSearch = ""; state.outError = ""; }
+    render();
+  }
+  else if (action === "clear-stock-product") {
+    const m = el.dataset.mode;
+    if (m === "in") { state.inProductId = ""; state.inSearch = ""; }
+    else { state.outProductId = ""; state.outSearch = ""; }
+    render();
+    const s = document.getElementById((m === "in" ? "in" : "out") + "Search");
+    if (s) s.focus();
+  }
+  else if (action === "set-stock-mode") {
+    const m = el.dataset.mode;
+    const sub = el.dataset.sub;
+    if (m === "in") state.inMode = sub; else state.outMode = sub;
+    if (sub === "import" && state.importFor !== m) resetImport();
+    render();
+  }
+  else if (action === "apply-import") applyImport();
+  else if (action === "download-template") downloadImportTemplate();
+  else if (action === "import-filter") {
+    const f = el.dataset.filter;
+    // Clicking the active filter again clears it back to showing all rows.
+    state.importFilter = state.importFilter === f ? "all" : f;
+    render();
+  }
+  else if (action === "toggle-delete-select") {
+    const id = el.dataset.id;
+    if (state.deleteSelected[id]) delete state.deleteSelected[id];
+    else state.deleteSelected[id] = true;
+    state.deleteConfirming = false;
+    render();
+  }
+  else if (action === "ask-bulk-delete") { state.deleteConfirming = true; state.deleteError = ""; render(); }
+  else if (action === "cancel-bulk-delete") { state.deleteConfirming = false; render(); }
+  else if (action === "confirm-bulk-delete") performBulkDelete();
+  else if (action === "quick-in") { state.tab = "in"; state.inProductId = el.dataset.id; state.inError = ""; render(); }
+  else if (action === "quick-out") { state.tab = "out"; state.outProductId = el.dataset.id; state.outError = ""; render(); }
+  else if (action === "remove-photo") {
+    state.newPhotos.splice(parseInt(el.dataset.index, 10), 1);
+    state.modalError = "";
+    render();
+  }
+  else if (action === "set-main-photo") {
+    const idx = parseInt(el.dataset.index, 10);
+    if (idx > 0) {
+      const pick = state.newPhotos.splice(idx, 1)[0];
+      state.newPhotos.unshift(pick);
+      render();
+    }
+  }
+  else if (action === "toggle-theme") toggleTheme();
+  else if (action === "toggle-lang") toggleLang();
+  else if (action === "scan") startScan(el.dataset.scanField);
+  else if (action === "start-scan-session") startScanSession(el.dataset.mode);
+  else if (action === "toggle-label-select") {
+    const id = el.dataset.id;
+    if (state.labelSelected[id]) delete state.labelSelected[id];
+    else state.labelSelected[id] = true;
+    render();
+  }
+  else if (action === "label-select-all") {
+    const q = state.labelSearch.trim().toLowerCase();
+    state.products.forEach(p => {
+      const match = !q || p.name.toLowerCase().includes(q) ||
+        (p.productId || "").toLowerCase().includes(q) || (p.barcode || "").toLowerCase().includes(q);
+      if (match) state.labelSelected[p.id] = true;
+    });
+    render();
+  }
+  else if (action === "label-clear") { state.labelSelected = {}; render(); }
+  else if (action === "generate-barcode") generateBarcodeForForm();
+  else if (action === "generate-missing") generateMissingBarcodes();
+  else if (action === "print-labels") { try { window.print(); } catch (err) { console.error(err); } }
+  else if (action === "open-lightbox") openLightbox(el.dataset.id);
+  else if (action === "close-lightbox") {
+    // Ignore clicks that land on the picture or the strip -- only the
+    // backdrop and the X should dismiss it.
+    if (e.target.closest(".lb-stage") || e.target.closest(".lb-strip")) {
+      if (!e.target.closest(".lb-close")) return;
+    }
+    closeLightbox();
+  }
+  else if (action === "lightbox-prev") stepLightbox(-1);
+  else if (action === "lightbox-next") stepLightbox(1);
+  else if (action === "lightbox-pick") { state.lightboxIndex = parseInt(el.dataset.index, 10) || 0; render(); }
+});
+
+appEl.addEventListener("submit", (e) => {
+  const el = e.target.closest("[data-action]");
+  if (!el) return;
+  e.preventDefault();
+  const action = el.dataset.action;
+  if (action === "submit-stock-in") submitStockIn();
+  else if (action === "submit-stock-out") submitStockOut();
+  else if (action === "submit-product") saveProduct();
+});
+
+// Applying a field value from typing OR from a barcode scan must behave
+// identically, so both go through here.
+function applyFieldValue(field, value) {
+  state[field] = value;
+
+  // Searching from the home menu opens Overview so the matching products show.
+  if (field === "search" && state.tab === "home" && String(value).trim()) {
+    state.tab = "overview";
+  }
+
+  if (field === "deleteQuery") {
+    state.deleteConfirming = false;
+    state.deleteError = "";
+    // Pasting IDs selects exactly those products; clearing the box clears the
+    // selection so nothing stays armed for deletion by accident.
+    state.deleteSelected = {};
+    const hits = matchIdTerms(parseIdTerms(value)).matched;
+    for (let i = 0; i < hits.length; i++) state.deleteSelected[hits[i].id] = true;
+  }
+
+  // A barcode scanner types the whole code then Enter. If what's typed exactly
+  // matches one product's ID or barcode, pick it straight away.
+  if (field === "inSearch" || field === "outSearch") {
+    const key = String(value).trim().toLowerCase();
+    if (key) {
+      const hits = state.products.filter(p =>
+        (p.productId || "").toLowerCase() === key || (p.barcode || "").toLowerCase() === key
+      );
+      if (hits.length === 1) {
+        if (field === "inSearch") { state.inProductId = hits[0].id; state.inSearch = ""; state.inError = ""; }
+        else { state.outProductId = hits[0].id; state.outSearch = ""; state.outError = ""; }
+      }
+    }
+  }
+}
+
+appEl.addEventListener("input", (e) => {
+  if (e.target.tagName === "SELECT") return;
+  const field = e.target.dataset.field;
+  if (!field) return;
+  let value = e.target.value;
+  if (e.target.inputMode === "numeric") {
+    value = value.replace(/[^0-9]/g, "");
+  } else if (e.target.inputMode === "decimal") {
+    value = value.replace(/[^0-9.]/g, "");
+    const dot = value.indexOf(".");
+    if (dot !== -1) value = value.slice(0, dot + 1) + value.slice(dot + 1).replace(/\./g, "");
+  }
+  applyFieldValue(field, value);
+  render();
+});
+
+appEl.addEventListener("change", (e) => {
+  if (e.target.id === "newPhotoInput") {
+    if (e.target.files && e.target.files.length) handlePhotoSelect(e.target.files);
+    e.target.value = "";
+    return;
+  }
+  if (e.target.id === "importFile") {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleImportFile(file, e.target.dataset.mode);
+    return;
+  }
+  if (e.target.tagName !== "SELECT") return;
+  const field = e.target.dataset.field;
+  if (field) { state[field] = e.target.value; render(); }
+});
+
+// ---------------- Firestore live sync ----------------
+
+if (!FIREBASE_NOT_CONFIGURED) {
+  onSnapshot(collection(db, "stock_products"), (snap) => {
+    state.products = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    state.productsLoaded = true;
+    render();
+  }, (err) => {
+    console.error("stock_products listener error", err);
+    state.productsLoaded = true;
+    render();
+  });
+
+  const txnQuery = query(collection(db, "stock_transactions"), orderBy("date", "desc"));
+  onSnapshot(txnQuery, (snap) => {
+    state.transactions = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+    state.transactionsLoaded = true;
+    render();
+  }, (err) => {
+    console.error("stock_transactions listener error", err);
+    state.transactionsLoaded = true;
+    render();
+  });
+}
+
+// Arrow keys / Escape while the lightbox is open.
+document.addEventListener("keydown", (e) => {
+  if (!state.lightboxProductId) return;
+  if (e.key === "Escape") { closeLightbox(); }
+  else if (e.key === "ArrowLeft") { stepLightbox(-1); }
+  else if (e.key === "ArrowRight") { stepLightbox(1); }
+  else return;
+  e.preventDefault();
+});
+
+// Swipe left/right on touch devices.
+let lbTouchX = null;
+appEl.addEventListener("touchstart", (e) => {
+  if (!state.lightboxProductId || !e.touches || !e.touches.length) return;
+  lbTouchX = e.touches[0].clientX;
+}, { passive: true });
+appEl.addEventListener("touchend", (e) => {
+  if (lbTouchX === null || !state.lightboxProductId) { lbTouchX = null; return; }
+  const endX = e.changedTouches && e.changedTouches.length ? e.changedTouches[0].clientX : null;
+  const dx = endX === null ? 0 : endX - lbTouchX;
+  lbTouchX = null;
+  if (Math.abs(dx) > 40) stepLightbox(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+(function initLang() {
+  let l = "kh";
+  try { l = localStorage.getItem("nija-stock-lang") === "en" ? "en" : "kh"; } catch (e) { l = "kh"; }
+  state.lang = l;
+  document.documentElement.setAttribute("lang", l === "kh" ? "km" : "en");
+})();
+
+(function initTheme() {
+  let t = document.documentElement.getAttribute("data-theme");
+  if (t !== "light" && t !== "dark") {
+    try { t = localStorage.getItem("nija-stock-theme") === "light" ? "light" : "dark"; } catch (e) { t = "dark"; }
+  }
+  state.theme = t;
+  document.documentElement.setAttribute("data-theme", t);
+})();
+
+render();
+</script>
+</body>
+</html>
