@@ -243,9 +243,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     transition: border-color .15s ease, background .15s ease;
   }
   .product-row:hover { border-color: var(--accent-tint-border); background: var(--surface-2); }
-  /* A red edge marks a row that needs reordering, so it reads at a glance
-     without hunting for the small number on the right. */
-  .product-row.is-low { box-shadow: inset 3px 0 0 var(--danger); }
   html[data-theme="light"] .product-row, html[data-theme="light"] .history-row { background: var(--bg); }
   html[data-theme="light"] .product-row:hover { background: var(--surface-2); }
   .product-row > .row-thumb-btn, .product-row > .row-thumb-placeholder { grid-area: thumb; }
@@ -278,7 +275,7 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   /* A labelled column, not a chip: a small colour-coded tag naming the field,
      with the value plainly beneath it. The tag identifies, so the value needs no
      box \u2014 which is what stops three filled blocks fighting for attention. */
-  .slot { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
+  .slot { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
   /* Geometry taken from the reference label: 6px corners, white ink, and enough
      padding to sit at roughly the same height. All three share it so the set
      stays uniform \u2014 only the fill colour differs. */
@@ -318,14 +315,9 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
      carries none of a button's own styling. */
   .extra-reserve {
     background: none; border: none; padding: 0; cursor: pointer;
-    font-family: inherit; text-align: left;
+    font-family: inherit; text-align: center;
   }
   .extra-reserve:hover .slot-code { text-decoration: underline; }
-  /* Nothing on the pick face while the reserve holds stock: the pick tag turns
-     red and the reserve tag becomes a blue call to action. */
-  .extra-loc.is-empty .slot-tag { background: var(--danger); color: var(--danger-ink); }
-  .extra-loc.is-empty .slot-qty { color: var(--danger); }
-  .extra-reserve.is-due .slot-tag { background: var(--move-fg); color: var(--move-ink); }
 
   .row-stock { grid-area: stock; text-align: right; padding: 0 2px; }
   .row-stock-num { font-size: 20px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--text); }
@@ -1522,8 +1514,11 @@ function binsOf(p) {
     const out = [];
     for (let i = 0; i < p.bins.length; i++) {
       const code = String((p.bins[i] && p.bins[i].code) || "").trim();
-      if (!code) continue;
-      out.push({ code: code, qty: Math.max(0, parseInt(p.bins[i].qty, 10) || 0) });
+      const qty = Math.max(0, parseInt(p.bins[i].qty, 10) || 0);
+      // A slot with a quantity but no code yet is still real stock \u2014 the
+      // code can be added later \u2014 so only truly empty slots are dropped.
+      if (!code && !qty) continue;
+      out.push({ code: code, qty: qty });
     }
     if (out.length) return out;
   }
@@ -2906,24 +2901,30 @@ function renderProductRow(p) {
   // need no boxes and no icons competing with them.
   const pick = bins[0] || null;
   const res = bins[1] || null;
-  const due = needsReplenish(p);
+
+  // A slot can hold a quantity before it has a code \u2014 the count is often
+  // known before the shelf is labelled \u2014 so the code area is simply
+  // skipped until one is entered, and only the quantity shows.
+  const codeSpan = code => code
+    ? '<span class="slot-code">' + escapeHtml(code) + "</span>"
+    : "";
 
   const pickCell = pick
-    ? '<div class="slot extra-loc' + (due ? " is-empty" : "") + '">' +
+    ? '<div class="slot extra-loc">' +
         '<span class="slot-tag slot-tag-pick">' + t("pickFaceLabel") + "</span>" +
         '<span class="slot-value">' +
-          '<span class="slot-code">' + escapeHtml(pick.code) + "</span>" +
+          codeSpan(pick.code) +
           '<span class="slot-qty">' + pick.qty + "</span>" +
         "</span>" +
       "</div>"
     : "";
 
   const resCell = res
-    ? '<button type="button" class="slot extra-reserve' + (due ? " is-due" : "") + '" data-action="replenish" data-id="' + p.id +
-        '" title="' + escapeHtml(due ? t("needsReplenish") : t("reserveLabel")) + '">' +
-        '<span class="slot-tag slot-tag-res">' + (due ? t("replenishWord") : t("reserveLabel")) + "</span>" +
+    ? '<button type="button" class="slot extra-reserve" data-action="replenish" data-id="' + p.id +
+        '" title="' + escapeHtml(t("reserveLabel")) + '">' +
+        '<span class="slot-tag slot-tag-res">' + t("reserveLabel") + "</span>" +
         '<span class="slot-value">' +
-          '<span class="slot-code">' + escapeHtml(res.code) + "</span>" +
+          codeSpan(res.code) +
           '<span class="slot-qty">' + res.qty + "</span>" +
         "</span>" +
       "</button>"
@@ -3800,7 +3801,7 @@ function renderBinEditor(editing) {
       "</div>" +
     "</div>";
 
-  const filled = state.newBins.filter(b => String(b.code || "").trim());
+  const filled = state.newBins.filter(b => String(b.code || "").trim() || Math.max(0, parseInt(b.qty, 10) || 0) > 0);
   const total = binsTotal(state.newBins.map(b => ({ code: b.code, qty: Math.max(0, parseInt(b.qty, 10) || 0) })));
   const mismatch = editing && filled.length && total !== editing.stock
     ? '<p class="hint hint-warn">' + t("binTotalMismatch") + " " + total + ".</p>"
@@ -4996,17 +4997,22 @@ async function saveProduct() {
   // are written to their own document below.
   const photo = photos.length ? await dataUrlToThumb(photos[0]) : "";
 
-  // Blank rows are dropped, and repeating a code merges into the first row that
-  // used it rather than creating two bins that fight over the same shelf.
+  // Fully blank rows are dropped. A row with a quantity but no code yet is
+  // kept \u2014 the count is often known before the shelf is labelled \u2014 and the
+  // code can be filled in later. Repeating a code merges into the first row
+  // that used it rather than creating two bins that fight over the same shelf;
+  // codeless rows have nothing to merge on, so they're kept as separate slots.
   const bins = [];
   const seen = {};
   for (let i = 0; i < state.newBins.length; i++) {
     const code = String(state.newBins[i].code || "").trim();
-    if (!code) continue;
     const qty = Math.max(0, parseInt(state.newBins[i].qty, 10) || 0);
-    const key = code.toUpperCase();
-    if (seen[key] !== undefined) { bins[seen[key]].qty += qty; continue; }
-    seen[key] = bins.length;
+    if (!code && !qty) continue;
+    if (code) {
+      const key = code.toUpperCase();
+      if (seen[key] !== undefined) { bins[seen[key]].qty += qty; continue; }
+      seen[key] = bins.length;
+    }
     bins.push({ code: code, qty: qty });
   }
   const location = bins.length ? bins[0].code : "";
