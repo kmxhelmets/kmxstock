@@ -580,6 +580,13 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
       background: var(--surface-2); overflow: hidden; color: var(--text-dimmer);
     }
     .sess-card-pic img { width: 100%; height: 100%; object-fit: contain; }
+    /* The thumbnail is being shown above its native size until the full photo
+       arrives. A touch of blur reads as "still loading" rather than as a bad
+       photo, and it hides the upscaling artefacts; the swap then feels like the
+       image settling into focus instead of a flicker. Cards whose sharp copy is
+       already in hand skip the transition entirely. */
+    .sess-card-img { filter: blur(0.6px); transition: filter .18s ease; }
+    .sess-card-img.is-sharp { filter: none; }
     .sess-card-add {
       position: absolute; top: 6px; right: 6px; width: 22px; height: 22px;
       border-radius: 50%; background: var(--success); color: #fff;
@@ -1195,8 +1202,10 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 import {
-  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
-  getDoc, setDoc, deleteField,
+  getFirestore, initializeFirestore,
+  persistentLocalCache, persistentMultipleTabManager,
+  collection, doc, addDoc, updateDoc, deleteDoc,
+  getDoc, getDocFromCache, setDoc, deleteField,
   onSnapshot, query, orderBy
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
@@ -1213,7 +1222,21 @@ const firebaseConfig = {
 
 const FIREBASE_NOT_CONFIGURED = !firebaseConfig.projectId;
 const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+// Without an on-disk cache, every page open re-reads the whole product
+// collection. At a few thousand products that alone can exhaust Firestore's
+// free daily read allowance, so the catalogue is cached in the browser and only
+// documents that actually changed are fetched afterwards.
+let db;
+try {
+  db = initializeFirestore(firebaseApp, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  });
+} catch (err) {
+  // Private windows and older browsers block IndexedDB; the app still works,
+  // it just pays the full read cost on each load.
+  console.warn("offline cache unavailable, falling back to memory only", err);
+  db = getFirestore(firebaseApp);
+}
 
 const CATEGORIES = [
   "Helmet", "Frame", "Plastic box", "Aluminum box", "Leather bag", "Mirror",
@@ -1410,8 +1433,49 @@ function scanBtn(field) {
 const PICK_PAGE = 48;
 
 const PHOTO_COLLECTION = "stock_photos";
-const THUMB_DIM = 120;
+
+// ---------------- image encoding ----------------
+// Storage, not pixels, is the scarce thing here: the free tier gives 1 GB and
+// the catalogue is heading for ~5,000 products. WebP carries roughly 30-40%
+// more detail than JPEG for the same number of bytes, so where the browser can
+// encode it the images get BIGGER dimensions at the SAME cost. Where it can't,
+// the old JPEG sizes are used unchanged, so nothing gets more expensive.
+//
+// Chrome, Edge, Firefox and Safari 14+ all encode WebP from a canvas. Older
+// engines quietly hand back a PNG instead — which would be far larger — so the
+// result is checked rather than trusted.
+let webpEncodes = null;
+function canEncodeWebp() {
+  if (webpEncodes !== null) return webpEncodes;
+  try {
+    const probe = document.createElement("canvas");
+    probe.width = 2; probe.height = 2;
+    webpEncodes = probe.toDataURL("image/webp", 0.7).indexOf("data:image/webp") === 0;
+  } catch (err) {
+    webpEncodes = false;
+  }
+  return webpEncodes;
+}
+
+function encodeCanvas(canvas, webpQuality, jpegQuality) {
+  return canEncodeWebp()
+    ? canvas.toDataURL("image/webp", webpQuality)
+    : canvas.toDataURL("image/jpeg", jpegQuality);
+}
+
+// The list thumbnail rides inside the product document, and every product
+// document is read on every catalogue load — so this is the number that has to
+// stay small. 160px WebP lands in the same few-KB range the 120px JPEG did.
+function thumbDim() { return canEncodeWebp() ? 160 : 120; }
 const THUMB_QUALITY = 0.6;
+const THUMB_QUALITY_WEBP = 0.62;
+
+// The full photo lives in its own document and is fetched only when something
+// displays it, so it can afford more detail. 640px WebP is about the same
+// stored size as the old 480px JPEG.
+function photoDim() { return canEncodeWebp() ? 640 : 480; }
+const PHOTO_QUALITY = 0.72;
+const PHOTO_QUALITY_WEBP = 0.74;
 
 // Products saved before the split still carry their images inline, so every
 // read path falls back to them and they migrate the next time the product is
@@ -1475,17 +1539,178 @@ function dataUrlToThumb(dataUrl) {
       img.onerror = () => finish("");
       img.onload = () => {
         try {
-          const size = calcResizedDimensions(img.naturalWidth || img.width, img.naturalHeight || img.height, THUMB_DIM);
+          const size = calcResizedDimensions(img.naturalWidth || img.width, img.naturalHeight || img.height, thumbDim());
           const canvas = document.createElement("canvas");
           canvas.width = size.width;
           canvas.height = size.height;
-          canvas.getContext("2d").drawImage(img, 0, 0, size.width, size.height);
-          finish(canvas.toDataURL("image/jpeg", THUMB_QUALITY));
+          const tctx = canvas.getContext("2d");
+          // Downscaling in one jump is what makes small thumbnails look muddy;
+          // asking for the best available resampling costs nothing and keeps
+          // edges and Khmer text on packaging legible.
+          tctx.imageSmoothingEnabled = true;
+          tctx.imageSmoothingQuality = "high";
+          tctx.drawImage(img, 0, 0, size.width, size.height);
+          finish(encodeCanvas(canvas, THUMB_QUALITY_WEBP, THUMB_QUALITY));
         } catch (err) { finish(""); }
       };
       img.src = dataUrl;
     } catch (err) { finish(""); }
   });
+}
+
+// ---------------- crisp card images ----------------
+// The picker draws a photo at roughly 190x104 CSS px, which is 380x208 real
+// pixels on a retina screen — three times what the 120px list thumbnail holds,
+// which is exactly why the cards looked soft. The sharp image already exists in
+// stock_photos; it just was never asked for. So the card paints the thumbnail
+// instantly and then swaps in the full photo underneath it.
+//
+// Nothing extra is stored for this. The only new cost is one document read per
+// product you actually look at, and that is fenced three ways:
+//   * the on-disk Firestore cache is asked first, so a product seen once is
+//     free from then on, in this session and every later one;
+//   * only cards that stay on screen fetch — scrolling past costs nothing;
+//   * a session cap stops a long browse from eating the daily read allowance.
+const CARD_IMG_CONCURRENCY = 3;
+const CARD_IMG_HOLD_MS = 180;
+const CARD_IMG_SESSION_CAP = 300;
+
+let cardImgReads = 0;          // billed reads spent on card images this session
+let cardImgActive = 0;
+const cardImgQueue = [];
+const cardImgReady = {};       // id -> sharp data URL, so re-renders don't flash
+const cardImgEmpty = {};       // ids with no stored photo doc; never ask twice
+
+function cardImgPump() {
+  while (cardImgActive < CARD_IMG_CONCURRENCY && cardImgQueue.length) {
+    const job = cardImgQueue.shift();
+    cardImgActive++;
+    Promise.resolve().then(job).catch(() => { /* a soft image is not an error */ })
+      .then(() => { cardImgActive--; cardImgPump(); });
+  }
+}
+
+function cardImgQueueJob(job) {
+  cardImgQueue.push(job);
+  cardImgPump();
+}
+
+// Like loadPhotos, but it will not spend a billed read once the session cap is
+// reached — a blurry card is a much smaller problem than a dead quota.
+async function loadPhotosForCard(id) {
+  if (photoCache[id]) return photoCache[id];
+  const p = state.products.find(x => x.id === id);
+  if (!p || cardImgEmpty[id]) return [];
+
+  const legacy = legacyPhotos(p);
+  if (legacy) { photoCache[id] = legacy.slice(); return photoCache[id]; }
+
+  // No photo document was ever written for this product, so there is nothing
+  // to fetch and no read worth spending.
+  if (!photoCountOf(p)) { cardImgEmpty[id] = true; return []; }
+
+  try {
+    const cached = await getDocFromCache(doc(db, PHOTO_COLLECTION, id));
+    const data = cached.exists() ? cached.data() : null;
+    const arr = data && Array.isArray(data.photos) ? data.photos : [];
+    if (arr.length) { photoCache[id] = arr; return arr; }
+  } catch (err) { /* not on disk yet — fall through to the server */ }
+
+  if (cardImgReads >= CARD_IMG_SESSION_CAP) return [];
+  cardImgReads++;
+  const arr = await loadPhotos(id);
+  if (!arr.length) cardImgEmpty[id] = true;
+  return arr;
+}
+
+// Decode off-screen first: assigning straight to src would blank the card for a
+// frame, which reads as a flicker when you are scanning quickly.
+// Sharp images are held as data URLs, so the map is trimmed rather than left to
+// grow: 150 of them is a few tens of MB, and anything dropped is still on disk
+// in the Firestore cache and so costs nothing to bring back.
+const CARD_IMG_KEEP = 150;
+function rememberSharpImage(id, url) {
+  const keys = Object.keys(cardImgReady);
+  if (keys.length >= CARD_IMG_KEEP) {
+    for (let i = 0; i < keys.length - CARD_IMG_KEEP + 1; i++) delete cardImgReady[keys[i]];
+  }
+  cardImgReady[id] = url;
+}
+
+function swapInSharpImage(el, id, url) {
+  const pre = new Image();
+  pre.onload = () => {
+    rememberSharpImage(id, url);
+    if (el.isConnected) { el.src = url; el.classList.add("is-sharp"); }
+  };
+  pre.src = url;
+}
+
+function upgradeCardImage(el) {
+  const id = el.getAttribute("data-photo-id");
+  if (!id || el.dataset.sharpQueued === "1") return;
+  el.dataset.sharpQueued = "1";
+  if (cardImgReady[id]) { el.src = cardImgReady[id]; el.classList.add("is-sharp"); return; }
+  cardImgQueueJob(async () => {
+    const photos = await loadPhotosForCard(id);
+    const full = photos && photos[0];
+    if (full && full !== el.getAttribute("src")) {
+      swapInSharpImage(el, id, full);
+      return;
+    }
+    // Nothing sharper is stored, or the cap has been reached. Either way this
+    // is the final image for that card, so it must not sit blurred forever.
+    if (el.isConnected) el.classList.add("is-sharp");
+  });
+}
+
+let cardImgObserver = null;
+const cardImgHolds = new Map();
+
+function clearCardImgHolds() {
+  cardImgHolds.forEach(timer => clearTimeout(timer));
+  cardImgHolds.clear();
+}
+
+// A card has to sit still on screen for a moment before it earns a fetch, so
+// flinging the grid from top to bottom doesn't queue a hundred of them.
+function watchCardImages(root) {
+  if (cardImgObserver) cardImgObserver.disconnect();
+  clearCardImgHolds();
+  if (!root) return;
+  const imgs = root.querySelectorAll("img[data-photo-id]");
+  if (!imgs.length) return;
+
+  if (typeof IntersectionObserver !== "function") {
+    // Old browser: upgrade the first screenful and leave the rest alone.
+    Array.prototype.slice.call(imgs, 0, 12).forEach(upgradeCardImage);
+    return;
+  }
+
+  cardImgObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const el = entry.target;
+      if (entry.isIntersecting) {
+        if (cardImgHolds.has(el)) return;
+        cardImgHolds.set(el, setTimeout(() => {
+          cardImgHolds.delete(el);
+          upgradeCardImage(el);
+          if (cardImgObserver) cardImgObserver.unobserve(el);
+        }, CARD_IMG_HOLD_MS));
+      } else {
+        const timer = cardImgHolds.get(el);
+        if (timer) { clearTimeout(timer); cardImgHolds.delete(el); }
+      }
+    });
+  }, { root: root, rootMargin: "150px 0px" });
+
+  imgs.forEach(el => cardImgObserver.observe(el));
+}
+
+function stopCardImages() {
+  if (cardImgObserver) { cardImgObserver.disconnect(); cardImgObserver = null; }
+  clearCardImgHolds();
+  cardImgQueue.length = 0;
 }
 
 // Writes the photo document alongside a product, or removes it when the last
@@ -1685,7 +1910,6 @@ const state = {
   lightboxProductId: null,
   lightboxIndex: 0,
   lightboxPics: [],
-  photosLoading: false,
   theme: "dark",
   lang: "kh",
 };
@@ -1755,8 +1979,10 @@ function resizeImageToBase64(file, maxDim, quality) {
           canvas.width = size.width;
           canvas.height = size.height;
           const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, 0, 0, size.width, size.height);
-          resolve(canvas.toDataURL("image/jpeg", quality));
+          resolve(encodeCanvas(canvas, PHOTO_QUALITY_WEBP, quality));
         } catch (err) {
           reject(err);
         }
@@ -1795,7 +2021,7 @@ async function handlePhotoSelect(fileList) {
       break;
     }
     try {
-      const data = await resizeImageToBase64(files[i], 480, 0.72);
+      const data = await resizeImageToBase64(files[i], photoDim(), PHOTO_QUALITY);
       if (totalPhotoBytes(state.newPhotos) + data.length > PHOTO_BUDGET) {
         state.modalError = t("photosTooLarge");
         break;
@@ -3950,6 +4176,8 @@ async function openEditModal(id) {
   state.newCategory = p.category;
   state.newStock = "";
   state.newThreshold = String(p.threshold);
+  // Show the list thumbnail immediately so the form isn't empty while the
+  // real full-size photos load in the background (see below).
   state.newPhotos = Array.isArray(p.photos) && p.photos.length ? p.photos.slice() : (p.photo ? [p.photo] : []);
   state.newProductId = p.productId || "";
   state.newBarcode = p.barcode || "";
@@ -3967,12 +4195,16 @@ async function openEditModal(id) {
   const el = document.getElementById("newName");
   if (el) el.focus();
 
-  if (state.photosLoading) {
+  // Swap the placeholder thumbnail out for the real full-size photos. Without
+  // this, saving the form (e.g. just to add another photo) would write the
+  // tiny 120px list-thumbnail back into stock_photos as if it were a full
+  // photo -- which is why an existing photo could come out blurry while a
+  // newly-added one stayed sharp.
+  if (!legacyPhotos(p) && photoCountOf(p) > 0) {
     const pics = await loadPhotos(id);
     // The form may have been closed, or another product opened, meanwhile.
     if (state.editingProductId !== id) return;
     state.newPhotos = pics.slice();
-    state.photosLoading = false;
     render();
   }
 }
@@ -4321,10 +4553,17 @@ function renderSessPickGrid() {
   grid.innerHTML = shown.length
     ? shown.map(p => {
         const th = thumbOf(p);
+        // A sharp copy fetched earlier is reused straight away, so typing in
+        // the search box never drops the cards back to the blurry thumbnail.
+        const sharp = cardImgReady[p.id];
+        const src = sharp || th;
         const low = p.stock <= p.threshold;
         return '<button type="button" class="sess-card" data-sess="pick" data-id="' + p.id + '">' +
           '<span class="sess-card-pic">' +
-            (th ? '<img src="' + th + '" alt="" />' : icon("camera", 18)) +
+            (src
+              ? '<img class="sess-card-img' + (sharp ? " is-sharp" : "") + '" src="' + src +
+                '" data-photo-id="' + p.id + '" alt="" decoding="async" />'
+              : icon("camera", 18)) +
             '<span class="sess-card-add">' + icon("plus", 13) + "</span>" +
           "</span>" +
           '<span class="sess-card-cat">' + escapeHtml(catLabel(p.category)) + "</span>" +
@@ -4344,6 +4583,10 @@ function renderSessPickGrid() {
         t("showingOf").replace("{a}", shown.length).replace("{b}", total) +
       "</p>");
   }
+
+  // Cards are cheap to draw and the full photos are not, so the fetching is
+  // driven by what is actually on screen rather than by what was rendered.
+  watchCardImages(grid);
 }
 
 function renderSessPick() {
@@ -4424,6 +4667,7 @@ function sessAddProduct(p, code) {
 }
 
 function stopScanSession() {
+  stopCardImages();
   if (sessTimer) { clearTimeout(sessTimer); sessTimer = null; }
   if (sessStream) {
     sessStream.getTracks().forEach(tr => { try { tr.stop(); } catch (e) { /* already stopped */ } });
@@ -4534,6 +4778,20 @@ async function startScanSession(mode) {
     "</div></div>";
   document.body.appendChild(sessEl);
   try { document.body.style.overflow = "hidden"; } catch (e) { /* no body */ }
+
+  // The category row only scrolls sideways with a touch drag, which is why it
+  // works on a tablet but goes nowhere under a desktop mouse's vertical wheel.
+  // Redirect an ordinary vertical scroll into horizontal movement whenever the
+  // pointer is over the row and it actually has overflow to scroll through;
+  // a trackpad's own horizontal swipe (deltaX already dominant) passes through
+  // untouched.
+  sessEl.addEventListener("wheel", (e) => {
+    const row = e.target.closest(".sess-pick-cats");
+    if (!row || row.scrollWidth <= row.clientWidth) return;
+    if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
+    row.scrollLeft += e.deltaY;
+    e.preventDefault();
+  }, { passive: false });
 
   sessEl.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-sess]");
@@ -5029,13 +5287,13 @@ async function saveProduct() {
       updatedAt: now,
     };
     // Editing a bin quantity is a real stock change, so it is written to the
-    // total and recorded in history instead of silently drifting.
-    let delta = 0;
-    if (bins.length) {
-      patch.bins = bins;
-      patch.stock = binsTotal(bins);
-      delta = patch.stock - Math.max(0, parseInt(before ? before.stock : 0, 10) || 0);
-    }
+    // total and recorded in history instead of silently drifting. The form
+    // always edits both slots, so an empty result is a real "clear the bins"
+    // save, not a no-op \u2014 it must overwrite what was there before, or a
+    // deleted location code would just keep showing the old value.
+    patch.bins = bins;
+    patch.stock = binsTotal(bins);
+    const delta = patch.stock - Math.max(0, parseInt(before ? before.stock : 0, 10) || 0);
     // The product itself is saved first and on its own. Writing the photos
     // first meant a photo failure aborted the whole save, so nothing was kept.
     try {
