@@ -812,6 +812,12 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   .toast.toast-show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   .hist-summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  /* Sits between the search box and the movement figures: what you searched
+     for, then what happened to it. */
+  .hist-product { margin-bottom: 14px; }
+  /* Candidates sit directly under the search box, the same as on the stock
+     pages, so the eye travels straight from what you typed to what it found. */
+  .hist-picks { margin-top: 8px; margin-bottom: 14px; }
   .hist-net { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 
   .dup-page { max-width: 520px; }
@@ -1113,7 +1119,10 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     .product-form-page .search-wrap, .product-form-page .filter-row { max-width: none; }
     /* History's own column is centred, and sits on the same content width as
        Overview and the forms so every page's search bar is the same length. */
-    .hist-summary, .history-list,
+    /* The product picker and the picked-product header belong to this column
+       too. Left out, they ignore the cap and run the full page width, which is
+       what made the results wider than the search bar that produced them. */
+    .hist-summary, .history-list, .hist-picks, .hist-product,
     .filter-row.filter-row-history, .search-wrap.search-wrap-history {
       max-width: var(--list-max); margin-left: auto; margin-right: auto;
     }
@@ -1855,6 +1864,9 @@ const state = {
   search: "",
   historyFilter: "all",
   historySearch: "",
+  // The product whose record is on screen. History is per-product, so it is a
+  // picked product, not a text query, that the page really runs on.
+  historyProductId: "",
   historySort: "desc",
   returnTab: "overview",
   editingProductId: null,
@@ -3905,6 +3917,68 @@ function renderDeleteTab() {
   );
 }
 
+// Typing narrows to candidates; picking one commits. It is the same two steps
+// the Stock In and Stock Out pages use, so a product is chosen the same way
+// wherever you are in the app.
+function renderHistoryPicks(q) {
+  if (!q) return "";
+  const matches = state.products.filter(p =>
+    (p.name || "").toLowerCase().includes(q) ||
+    (p.productId || "").toLowerCase().includes(q) ||
+    (p.barcode || "").toLowerCase().includes(q)
+  );
+  if (!matches.length) return "";
+  const shown = matches.slice(0, 8);
+
+  const rows = shown.map(p => {
+    const th = thumbOf(p);
+    const thumb = th
+      ? '<img class="row-thumb" src="' + th + '" alt="" />'
+      : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
+    return (
+      '<button type="button" class="pick-row" data-action="select-history-product" data-id="' + p.id + '">' +
+        thumb +
+        '<span class="pick-info">' +
+          '<span class="pick-name">' + escapeHtml(p.name) + "</span>" +
+          '<span class="pick-meta">' +
+            (p.productId ? escapeHtml(p.productId) : t("noId")) +
+            (p.barcode ? " \u00b7 " + escapeHtml(p.barcode) : "") +
+          "</span>" +
+        "</span>" +
+        '<span class="pick-stock' + (p.stock <= p.threshold ? " low" : "") + '">' + p.stock + "</span>" +
+      "</button>"
+    );
+  }).join("");
+
+  return '<div class="pick-list hist-picks">' + rows + "</div>";
+}
+
+// The header once a product is committed to: photo, name, stock on hand and ID,
+// with the search box gone. What you are looking at the record of should be
+// stated, not inferred from the rows.
+function renderHistoryProduct(p) {
+  if (!p) return "";
+  const th = thumbOf(p);
+  const thumb = th
+    ? '<img class="row-thumb" src="' + th + '" alt="" />'
+    : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
+  return (
+    '<div class="form-group hist-product">' +
+      "<label>" + t("product") + "</label>" +
+      '<div class="picked-row">' +
+        thumb +
+        '<div class="picked-info">' +
+          '<div class="picked-name">' + escapeHtml(p.name) + "</div>" +
+          '<div class="picked-meta">' + p.stock + " " + t("inStock") +
+            (p.productId ? " \u00b7 " + escapeHtml(p.productId) : "") +
+          "</div>" +
+        "</div>" +
+        '<button type="button" class="link-btn" data-action="clear-history-product">' + t("change") + "</button>" +
+      "</div>" +
+    "</div>"
+  );
+}
+
 function renderHistory() {
   if (state.transactions.length === 0) {
     return (
@@ -3919,9 +3993,17 @@ function renderHistory() {
   const byDocId = {};
   for (let i = 0; i < state.products.length; i++) byDocId[state.products[i].id] = state.products[i];
 
+  // A product that was picked and then deleted would otherwise leave the page
+  // pinned to something that no longer exists.
+  let selected = state.historyProductId ? byDocId[state.historyProductId] : null;
+  if (state.historyProductId && !selected) { state.historyProductId = ""; selected = null; }
+
   const q = state.historySearch.trim().toLowerCase();
   const filtered = state.transactions.filter(t => {
     if (state.historyFilter !== "all" && t.type !== state.historyFilter) return false;
+    // Once a product is picked its record is the whole page: every movement of
+    // that product, not just the ones whose text happens to match.
+    if (selected) return t.productId === selected.id;
     if (!q) return true;
     const p = byDocId[t.productId];
     return (t.productName || "").toLowerCase().includes(q) ||
@@ -3951,7 +4033,7 @@ function renderHistory() {
 
   // History is a per-product record, so it stays empty until a product is
   // named. Scrolling the whole warehouse's movements answers no question.
-  if (!q) {
+  if (!q && !selected) {
     return '<div class="filter-row filter-row-history">' + chips + "</div>" + search +
       '<div class="empty-state">' + icon("search", 30) +
         '<p class="empty-title">' + t("historyPromptTitle") + "</p>" +
@@ -3959,8 +4041,17 @@ function renderHistory() {
       "</div>";
   }
 
+  // Selected: the product header stands in for the search box, exactly as it
+  // does on the stock pages. Not selected: the box stays, with the candidates
+  // it matches underneath.
+  const head = selected
+    ? renderHistoryProduct(selected)
+    : search + renderHistoryPicks(q);
+
   if (filtered.length === 0) {
-    return '<div class="filter-row filter-row-history">' + chips + "</div>" + search +
+    // With a product named, an empty list means "nothing has moved yet", which
+    // is a real answer — quite different from "no such product".
+    return '<div class="filter-row filter-row-history">' + chips + "</div>" + head +
       '<div class="empty-inline">' + t("noMatchingActivity") + "</div>";
   }
 
@@ -4001,14 +4092,14 @@ function renderHistory() {
         '<div class="history-icon ' + toneClass + '">' + icon(isMove ? "move" : (isIn ? "up" : "down"), 13) + "</div>" +
         '<div class="history-info">' +
           '<div class="history-detail">' + detail + "</div>" +
-          '<div class="history-name">' + escapeHtml(t.productName) + "</div>" +
+          (selected ? "" : '<div class="history-name">' + escapeHtml(t.productName) + "</div>") +
         "</div>" +
         '<div class="history-amount ' + amtClass + '">' + sign + t.qty + "</div>" +
       "</div>"
     );
   }).join("");
 
-  return '<div class="filter-row filter-row-history">' + chips + "</div>" + search + summary +
+  return '<div class="filter-row filter-row-history">' + chips + "</div>" + head + summary +
     '<div class="history-list">' + rows + "</div>";
 }
 
@@ -5647,11 +5738,26 @@ appEl.addEventListener("click", (e) => {
   }
   else if (action === "set-history-filter") { state.historyFilter = el.dataset.filter; render(); }
   else if (action === "view-product-history") {
+    // Arriving from a product page, the product is already known — so it is
+    // picked outright rather than typed into the search box and matched again.
     const p = state.products.find(x => x.id === state.editingProductId);
-    state.historySearch = p ? (p.productId || p.barcode || p.name || "") : "";
+    state.historyProductId = p ? p.id : "";
+    state.historySearch = "";
     state.historyFilter = "all";
     state.tab = "history";
     render();
+  }
+  else if (action === "select-history-product") {
+    state.historyProductId = el.dataset.id;
+    state.historySearch = "";
+    render();
+  }
+  else if (action === "clear-history-product") {
+    state.historyProductId = "";
+    state.historySearch = "";
+    render();
+    const s = document.getElementById("historySearch");
+    if (s) s.focus();
   }
   else if (action === "toggle-history-sort") {
     state.historySort = state.historySort === "desc" ? "asc" : "desc";
@@ -5841,6 +5947,25 @@ function applyFieldValue(field, value) {
         state[m + "ProductId"] = hits[0].id;
         state[m + "Search"] = "";
         state[m + "Error"] = "";
+      }
+    }
+  }
+
+  // History picks the same way, with one addition: the full product name counts
+  // as an exact match too. Coming from a product page or from the app's own
+  // suggestions the name is what lands in the box, and stopping to click a
+  // single obvious result would be a step for nothing.
+  if (field === "historySearch") {
+    const key = String(value).trim().toLowerCase();
+    if (key) {
+      const hits = state.products.filter(p =>
+        (p.productId || "").toLowerCase() === key ||
+        (p.barcode || "").toLowerCase() === key ||
+        (p.name || "").toLowerCase() === key
+      );
+      if (hits.length === 1) {
+        state.historyProductId = hits[0].id;
+        state.historySearch = "";
       }
     }
   }
