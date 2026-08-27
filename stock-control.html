@@ -310,6 +310,11 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   }
   .slot-qty { font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text); flex-shrink: 0; }
   .extra-barcode .slot-code { font-size: 12.5px; letter-spacing: .08em; }
+  /* The barcode value is much longer than its tag, so centring pushed the tag
+     into the middle of the number. The shelf codes and the price are short
+     enough that a centred tag still sits over its value, so only this one is
+     pulled left. */
+  .extra-barcode { align-items: flex-start; }
 
   /* The reserve column is the tap target for Replenish, so it is a button but
      carries none of a button's own styling. */
