@@ -224,116 +224,131 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   .input:focus { border-color: var(--signal); box-shadow: 0 0 0 3px var(--focus-ring); }
   .input-search { padding-left: 34px; }
 
-  .product-list, .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
   .history-row {
     display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius);
     background: var(--surface); border: 1px solid var(--border);
   }
-  /* One product per line. Every field owns a named grid area, so names,
-     locations, barcodes and stock numbers line up straight down the list
-     instead of drifting with the length of each product name. */
-  .product-row {
-    --thumb: 46px;
-    display: grid; align-items: center;
-    grid-template-columns: var(--thumb) minmax(0, 1fr) auto auto;
-    grid-template-areas: "thumb info stock actions";
-    column-gap: 12px; row-gap: 8px;
-    padding: 12px; border-radius: var(--radius);
+  html[data-theme="light"] .history-row { background: var(--bg); }
+
+  /* Overview is a card grid: one self-contained panel per product, laid out in
+     as many columns as the width allows. One column on a phone, up to three on
+     a desktop. */
+  .product-list {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px; align-content: start;
+  }
+  /* The card is a column, and the action bar is pushed to the bottom of it, so
+     cards in the same row end level however much text each one carries. */
+  .product-card {
+    display: flex; flex-direction: column;
+    padding: 14px; border-radius: var(--radius);
     background: var(--surface); border: 1px solid var(--border);
     transition: border-color .15s ease, background .15s ease;
   }
-  .product-row:hover { border-color: var(--accent-tint-border); background: var(--surface-2); }
-  html[data-theme="light"] .product-row, html[data-theme="light"] .history-row { background: var(--bg); }
-  html[data-theme="light"] .product-row:hover { background: var(--surface-2); }
-  .product-row > .row-thumb-btn, .product-row > .row-thumb-placeholder { grid-area: thumb; }
-  .product-info { grid-area: info; min-width: 0; }
+  .product-card:hover { border-color: var(--accent-tint-border); background: var(--surface-2); }
+  /* Held for a moment on the card you came back to, so your eye lands on it
+     instead of searching the grid for where you were. */
+  .product-card.is-back { border-color: var(--signal); box-shadow: 0 0 0 3px var(--accent-tint); }
+  html[data-theme="light"] .product-card { background: var(--bg); }
+  html[data-theme="light"] .product-card:hover { background: var(--surface-2); }
+
+  /* Photo left, age right — the two things you take in before reading. */
+  .pcard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .pcard-age { font-size: 11.5px; color: var(--text-dimmer); white-space: nowrap; padding-top: 3px; }
   .row-thumb { width: 42px; height: 42px; border-radius: var(--radius-sm); object-fit: cover; flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); }
   .row-thumb-placeholder { width: 42px; height: 42px; border-radius: var(--radius-sm); flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dimmer); }
-  .product-row .row-thumb, .product-row .row-thumb-placeholder {
-    width: var(--thumb); height: var(--thumb); border-radius: 8px;
+  .product-card .row-thumb, .product-card .row-thumb-placeholder { width: 48px; height: 48px; border-radius: 10px; }
+  .row-thumb-btn { padding: 0; border: none; background: none; cursor: pointer; display: flex; }
+
+  /* Takes the slack, so the figures and the action bar sit at the foot of every
+     card whether the name runs to one line or three. */
+  .pcard-body { flex: 1; min-width: 0; }
+  /* Wraps here rather than truncating: a card has the room, and half a Khmer
+     product name is not enough to pick from. */
+  .product-name { font-size: 15px; font-weight: 600; letter-spacing: -.005em; line-height: 1.35; }
+  .pcard-sub { font-size: 12.5px; color: var(--text-dim); margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+  /* One line per fact. The coloured tag at the head of each line already names
+     the field, so a leading icon was a second label saying the same thing. */
+  .pcard-line { display: flex; align-items: center; gap: 7px; margin-top: 9px; min-width: 0; }
+  .pcard-bins { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; }
+  .pcard-bin { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+  .pcard-bin-btn { background: none; border: none; padding: 0; font-family: inherit; cursor: pointer; }
+  .pcard-bin-btn:hover .slot-code, .pcard-bin-btn:hover .slot-qty { text-decoration: underline; }
+  /* The figure held in a slot. Bigger and bolder than the code beside it, and
+     carrying its slot's colour, so a glance across the card lands on the
+     numbers rather than on the shelf labels. */
+  .slot-qty {
+    font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums;
+    letter-spacing: 0; flex-shrink: 0;
   }
-  .product-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
-  .product-name { font-size: 14px; font-weight: 600; letter-spacing: -.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; max-width: 100%; }
-  .low-flag { flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--danger); }
-  /* Category, low flag and the reorder text share one line and never wrap, so
-     every row is exactly two lines tall whatever the name is. */
-  .product-meta {
-    display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;
-    font-size: 12px; color: var(--text-dim); margin-top: 4px;
-    font-variant-numeric: tabular-nums; min-width: 0;
-  }
-  .meta-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-  /* Sits in the implicit second row, starting under the product name. When a
-     product has no location or barcode the element is not rendered at all, so
-     no empty row is left behind. */
-  /* On a phone the three chips wrap onto as many lines as they need; on desktop
-     each one takes its own grid column instead. */
-  .product-extra {
-    grid-column: 2 / -1; display: flex; column-gap: 18px; row-gap: 8px;
-    flex-wrap: wrap; min-width: 0;
-  }
-  /* A labelled column, not a chip: a small colour-coded tag naming the field,
-     with the value plainly beneath it. The tag identifies, so the value needs no
-     box \u2014 which is what stops three filled blocks fighting for attention. */
-  .slot { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+  .slot-qty.is-pick { color: var(--signal); }
+  .slot-qty.is-res { color: var(--slot2); }
+  .slot-qty.is-zero { color: var(--danger); }
+
   /* Geometry taken from the reference label: 6px corners, white ink, and enough
      padding to sit at roughly the same height. All three share it so the set
-     stays uniform \u2014 only the fill colour differs. */
+     stays uniform — only the fill colour differs. */
   .slot-tag {
     font-size: 11px; font-weight: 600; line-height: 1.5; letter-spacing: .01em;
     padding: 2px 9px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
     border: 1px solid transparent;
   }
   html[lang="km"] .slot-tag { font-size: 10px; }
-  /* Pick face keeps the brand orange \u2014 the shelf you actually walk to. */
+  /* Pick face keeps the brand orange — the shelf you actually walk to. */
   .slot-tag-pick { background: var(--signal); color: var(--signal-ink); }
   /* Reserve takes the second hue, so the two are distinguished by colour rather
      than by reading the code. */
   .slot-tag-res { background: var(--slot2); color: var(--slot2-ink); }
-  /* The barcode gets a solid tag too, so all three read as one set \u2014 but in
+  /* The barcode gets a solid tag too, so all three read as one set — but in
      slate, so it still sits behind the two shelf codes. */
   .slot-tag-code { background: var(--slot3); color: var(--slot3-ink); }
-  /* Reference data like the barcode, so it shares the slate tag; the figure
-     itself is green, matching how price reads on the sales screen. */
-  /* Reserves the label row without drawing anything. */
-  .slot-tag-ghost { background: none; border-color: transparent; }
+  .slot-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px; font-weight: 500; letter-spacing: .05em; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+  }
   .slot-money {
-    font-size: 13.5px; font-weight: 700; color: var(--success);
+    font-size: 17px; font-weight: 700; color: var(--success);
     font-variant-numeric: tabular-nums; white-space: nowrap;
   }
 
-  .slot-value { display: flex; align-items: baseline; gap: 7px; min-width: 0; max-width: 100%; line-height: 1.4; }
-  .slot-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 13px; font-weight: 500; letter-spacing: .05em; color: var(--text);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+  /* Price and stock share the last line before the actions: what it costs on
+     the left, what is on hand on the right. */
+  /* Spacing separates the figures from the detail above them; a rule across the
+     card was cutting it in two. */
+  .pcard-figures {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    margin-top: 16px;
   }
-  .slot-qty { font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text); flex-shrink: 0; }
-  .extra-barcode .slot-code { font-size: 12.5px; letter-spacing: .08em; }
-  /* The barcode value is much longer than its tag, so centring pushed the tag
-     into the middle of the number. The shelf codes and the price are short
-     enough that a centred tag still sits over its value, so only this one is
-     pulled left. */
-  .extra-barcode { align-items: flex-start; }
-
-  /* The reserve column is the tap target for Replenish, so it is a button but
-     carries none of a button's own styling. */
-  .extra-reserve {
-    background: none; border: none; padding: 0; cursor: pointer;
-    font-family: inherit; text-align: center;
-  }
-  .extra-reserve:hover .slot-code { text-decoration: underline; }
-
-  .row-stock { grid-area: stock; text-align: right; padding: 0 2px; }
+  .pcard-stock { display: flex; align-items: baseline; gap: 5px; }
   .row-stock-num { font-size: 20px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--text); }
   .row-stock-num.low { color: var(--danger); }
-  .row-stock-label { font-size: 10px; color: var(--text-dimmer); margin-top: 1px; white-space: nowrap; }
+  .row-stock-label { font-size: 10.5px; color: var(--text-dimmer); white-space: nowrap; }
+  .pcard-flags { margin-top: 8px; }
+  .low-flag { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--danger); }
 
-  .row-actions { grid-area: actions; display: flex; align-items: center; gap: 2px; }
+  /* One bar across the foot, like the reference card's single action — but
+     split, because a product has three things you might want to do to it. */
+  .pcard-actions {
+    display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; margin-top: 12px;
+  }
+  .pcard-act {
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 9px 10px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: none; color: var(--text-dim);
+    font-family: inherit; font-size: 12.5px; font-weight: 500; cursor: pointer;
+    min-width: 0; transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .pcard-act span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pcard-act:hover { background: var(--surface-2); color: var(--text); }
+  .pcard-act-in:hover { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .pcard-act-out:hover { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+  .pcard-act-edit { padding: 9px 11px; }
+
   .icon-btn { background: none; border: none; color: var(--text-dim); padding: 7px; border-radius: var(--radius-sm); cursor: pointer; display: flex; }
   .icon-btn:hover { background: var(--surface-2); color: var(--text); }
-  .icon-btn-up:hover { background: var(--success-bg); color: var(--success); }
-  .icon-btn-down:hover { background: var(--danger-bg); color: var(--danger); }
   .confirm-row { display: flex; align-items: center; gap: 6px; font-size: 12px; flex-shrink: 0; }
   .btn-yes, .btn-no { border: none; padding: 5px 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; cursor: pointer; }
   .btn-yes { background: var(--danger-bg); color: var(--danger); }
@@ -1098,10 +1113,10 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   .submit-btn[disabled], .btn[disabled] { opacity: .5; cursor: not-allowed; filter: none; }
 
   @media (max-width: 560px) {
-    .product-row { --thumb: 42px; column-gap: 10px; padding: 10px; align-items: start; }
-    .product-name { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
-    .row-stock { padding-top: 2px; }
-    .row-actions { flex-wrap: wrap; justify-content: flex-end; max-width: 76px; }
+    /* One card per row on a narrow phone: two columns of 280px would not fit,
+       and a card squeezed below that starts wrapping its action labels. */
+    .product-list { grid-template-columns: 1fr; }
+    .product-card { padding: 12px; }
     .icon-btn { padding: 6px; }
     .content { padding: 16px; }
   }
@@ -1128,31 +1143,17 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     .launch-tile { font-size: 14px; gap: 12px; }
     .content { padding: 24px 32px 40px; }
 
-    /* One shared track list keeps every row locked to the same columns. */
-    :root {
-      --thumb-d: 56px;
-      /* thumb | name | pick face | reserve | barcode | stock | actions */
-      --product-cols: var(--thumb-d) minmax(0, 1fr) 112px 112px 152px 92px 84px 96px;
+    /* The extra width goes into more columns of cards rather than wider ones.
+       340px is the width at which a card holds a bin code, a barcode and its
+       action labels without wrapping; the 1260px cap then settles it at three
+       across, which is what the reference layout does. */
+    .product-list {
+      max-width: var(--list-max); margin-left: auto; margin-right: auto;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;
     }
-    /* One product per row. The extra width goes into dedicated columns for
-       location, barcode and stock rather than a second card, so the list reads
-       like a table and every value is in the same place on every line. */
-    .product-list { max-width: var(--list-max); margin-left: auto; margin-right: auto; }
-    .product-row {
-      --thumb: var(--thumb-d);
-      grid-template-columns: var(--product-cols);
-      grid-template-areas: "thumb info loc res code price stock actions";
-      column-gap: 16px; padding: 12px 16px;
-    }
-    /* The chips become grid items of the row itself, so they land in their own
-       columns instead of wrapping onto a second line. */
-    .product-extra { display: contents; }
-    .extra-loc { grid-area: loc; }
-    .extra-reserve { grid-area: res; }
-    .extra-barcode { grid-area: code; }
-    .extra-price { grid-area: price; }
-    .product-row .row-actions { justify-content: flex-end; }
-    .product-row .row-stock-num { font-size: 22px; }
+    .product-card { padding: 16px; }
+    .product-card .row-thumb, .product-card .row-thumb-placeholder { width: 52px; height: 52px; }
+    .product-card .row-stock-num { font-size: 22px; }
     /* History stays a single column: a grid would run left-to-right then wrap,
        which scrambles the date order. Capped so rows stay readable. */
     /* Width caps only. .filter-row and .search-wrap are shared with the Stock
@@ -1915,6 +1916,10 @@ const state = {
   historyProductId: "",
   historySort: "desc",
   returnTab: "overview",
+  // The product whose card you left Overview from. Coming back, the list scrolls
+  // to it rather than to the top — with a long catalogue, landing at the top
+  // means hunting for your place again after every edit.
+  focusProductId: "",
   editingProductId: null,
   deleteQuery: "",
   deleteSelected: {},
@@ -2871,7 +2876,36 @@ function render() {
     }
   }
   scrollActiveTabIntoView(appEl);
+  restoreProductScroll(appEl);
   syncPrintPageStyle();
+}
+
+// Coming back to Overview from a product's Edit or Stock In form, the browser
+// has just been handed a whole new page and is sitting at the top. Scroll to the
+// card that was left from instead, and mark it for a moment so it can be picked
+// out of the grid. Consumed once: the next Overview render is an ordinary one.
+function restoreProductScroll(appEl) {
+  if (state.tab !== "overview" || !state.focusProductId) return;
+  const id = state.focusProductId;
+  state.focusProductId = "";
+  const card = appEl.querySelector('.product-card[data-id="' + cssEscape(id) + '"]');
+  // The product may have been filtered out, or deleted while the form was open.
+  if (!card) return;
+  try {
+    card.scrollIntoView({ block: "center", behavior: "auto" });
+  } catch (err) {
+    card.scrollIntoView(false);
+  }
+  card.classList.add("is-back");
+  setTimeout(() => { try { card.classList.remove("is-back"); } catch (e) { /* gone */ } }, 1600);
+}
+
+// Firestore ids are alphanumeric, but they are going into a selector, so they
+// are escaped rather than trusted. CSS.escape is missing on older engines.
+function cssEscape(value) {
+  const v = String(value);
+  if (typeof CSS !== "undefined" && CSS.escape) return CSS.escape(v);
+  return v.replace(/["\\]/g, "\\$&");
 }
 
 // The tab strip scrolls sideways on narrow screens, so the selected tab can end
@@ -2956,11 +2990,14 @@ function renderHeader() {
   // in the header instead of a short menu name.
   if (state.tab === "in" || state.tab === "out") {
     const isIn = state.tab === "in";
+    // Reached from a product card, Back returns to that list; reached from the
+    // home menu, it returns there.
+    const backTo = state.returnTab || "home";
     return (
       '<div class="header">' +
         '<div class="brand">' +
           '<div class="brand-left">' +
-            '<button type="button" class="back-btn" data-action="set-tab" data-tab="home" title="' + escapeHtml(t("back")) + '" aria-label="' + escapeHtml(t("back")) + '">' + icon("chevronLeft", 20) + "</button>" +
+            '<button type="button" class="back-btn" data-action="set-tab" data-tab="' + backTo + '" title="' + escapeHtml(t("back")) + '" aria-label="' + escapeHtml(t("back")) + '">' + icon("chevronLeft", 20) + "</button>" +
             icon(isIn ? "up" : "down", 20, isIn ? "icon-up" : "icon-down") +
             '<h1 class="section-title">' + escapeHtml(isIn ? t("stockInTitle") : t("stockOutTitle")) + "</h1>" +
           "</div>" +
@@ -2985,7 +3022,7 @@ function renderHeader() {
       // badge on the page itself: amber when adding, blue when editing.
       color = state.editingProductId ? "var(--move-fg)" : "var(--signal)";
     }
-    const backTo = state.tab === "product-form" ? "overview" : "home";
+    const backTo = state.tab === "product-form" ? (state.returnTab || "overview") : "home";
     return (
       '<div class="header">' +
         '<div class="brand">' +
@@ -3173,96 +3210,100 @@ function renderProductRow(p) {
   const low = p.stock <= p.threshold;
   const updated = formatRelativeTime(p.updatedAt || p.createdAt);
   const th = thumbOf(p);
-  const bins = binsOf(p);
   const thumb = th
     ? '<button type="button" class="row-thumb-btn" data-action="open-lightbox" data-id="' + p.id + '">' +
         '<img class="row-thumb" src="' + th + '" alt="" />' +
       "</button>"
     : '<div class="row-thumb-placeholder">' + icon("camera", 16) + "</div>";
 
-  // Each field is a labelled column: a small colour-coded tag naming what it is,
-  // with the value plainly below it. The tag does the identifying, so the values
-  // need no boxes and no icons competing with them.
+  // A card, not a row: photo and age at the top, then the product's identity,
+  // where it lives, what it costs and what is on hand, with the three actions
+  // as one bar across the foot. Each field keeps the small colour-coded tag it
+  // had in the list, so a bin code still reads the same way it always did.
+  const bins = binsOf(p);
   const pick = bins[0] || null;
   const res = bins[1] || null;
 
-  // A slot can hold a quantity before it has a code \u2014 the count is often
-  // known before the shelf is labelled \u2014 so the code area is simply
-  // skipped until one is entered, and only the quantity shows.
-  const codeSpan = code => code
-    ? '<span class="slot-code">' + escapeHtml(code) + "</span>"
-    : "";
+  // A slot can hold a quantity before it has a code — the count is often known
+  // before the shelf is labelled — so the code is simply skipped until one is
+  // entered, and only the quantity shows.
+  // The quantity is the thing you are actually checking on this line, so it is
+  // pulled out of the code's run of grey monospace and given weight and the
+  // colour of its own slot. A zero goes red instead: an empty pick face with
+  // stock still in reserve is exactly what Replenish is for.
+  const binText = (b, hue) =>
+    (b.code ? '<span class="slot-code">' + escapeHtml(b.code) + "</span>" : "") +
+    '<span class="slot-qty' + (Number(b.qty) > 0 ? " " + hue : " is-zero") + '">' + b.qty + "</span>";
 
-  const pickCell = pick
-    ? '<div class="slot extra-loc">' +
+  const pickPart = pick
+    ? '<span class="pcard-bin">' +
         '<span class="slot-tag slot-tag-pick">' + t("pickFaceLabel") + "</span>" +
-        '<span class="slot-value">' +
-          codeSpan(pick.code) +
-          '<span class="slot-qty">' + pick.qty + "</span>" +
-        "</span>" +
-      "</div>"
+        binText(pick, "is-pick") +
+      "</span>"
     : "";
 
-  const resCell = res
-    ? '<button type="button" class="slot extra-reserve" data-action="replenish" data-id="' + p.id +
+  // The reserve slot stays the tap target for Replenish, as it was in the list.
+  const resPart = res
+    ? '<button type="button" class="pcard-bin pcard-bin-btn" data-action="replenish" data-id="' + p.id +
         '" title="' + escapeHtml(t("reserveLabel")) + '">' +
         '<span class="slot-tag slot-tag-res">' + t("reserveLabel") + "</span>" +
-        '<span class="slot-value">' +
-          codeSpan(res.code) +
-          '<span class="slot-qty">' + res.qty + "</span>" +
-        "</span>" +
+        binText(res, "is-res") +
       "</button>"
     : "";
 
-  const codeCell = p.barcode
-    ? '<div class="slot extra-barcode">' +
-        '<span class="slot-tag slot-tag-code">' + t("barcodeLabel") + "</span>" +
-        '<span class="slot-value"><span class="slot-code">' + escapeHtml(p.barcode) + "</span></span>" +
+  const binLine = (pickPart || resPart)
+    ? '<div class="pcard-line">' +
+        '<span class="pcard-bins">' + pickPart + resPart + "</span>" +
       "</div>"
     : "";
 
-  // Products priced at zero are usually just unpriced, so the column stays
-  // empty for them rather than claiming they are free.
-  const priceVal = Number(p.price) || 0;
-  const priceCell = priceVal > 0
-    ? '<div class="slot extra-price">' +
-        // The currency symbol says what this is, so the label is dropped. An
-        // empty tag keeps the label row's height, which is what lines the price
-        // up with the codes beside it instead of floating a line higher.
-        '<span class="slot-tag slot-tag-ghost" aria-hidden="true">&nbsp;</span>' +
-        '<span class="slot-value"><span class="slot-money">' + money(priceVal) + "</span></span>" +
+  const codeLine = p.barcode
+    ? '<div class="pcard-line">' +
+        '<span class="pcard-bin">' +
+          '<span class="slot-tag slot-tag-code">' + t("barcodeLabel") + "</span>" +
+          '<span class="slot-code">' + escapeHtml(p.barcode) + "</span>" +
+        "</span>" +
       "</div>"
     : "";
+
+  // Products priced at zero are usually just unpriced, so the line stays empty
+  // for them rather than claiming they are free.
+  const priceVal = Number(p.price) || 0;
 
   return (
-    '<div class="product-row' + (low ? " is-low" : "") + '">' +
-      thumb +
-      '<div class="product-info">' +
-        '<div class="product-name-row">' +
-          '<span class="product-name" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</span>" +
+    '<div class="product-card' + (low ? " is-low" : "") + '" data-id="' + p.id + '">' +
+      '<div class="pcard-top">' +
+        thumb +
+        (updated ? '<span class="pcard-age">' + escapeHtml(updated) + "</span>" : "") +
+      "</div>" +
+      '<div class="pcard-body">' +
+        '<div class="product-name" title="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</div>" +
+        '<div class="pcard-sub">' + escapeHtml(catLabel(p.category)) +
+          " \u00b7 " + t("reorderAt") + " " + p.threshold +
         "</div>" +
-        // The tag rides on the meta line rather than after the name, so a long
-        // name can't push it onto a second line and stretch every row.
-        '<div class="product-meta">' +
-          (low ? '<span class="low-flag">' + icon("alert", 12) + " " + t("low") + "</span>" : "") +
-          '<span class="meta-text">' + escapeHtml(catLabel(p.category)) +
-            " \u00b7 " + t("reorderAt") + " " + p.threshold +
-            (updated ? " \u00b7 " + t("updated") + " " + updated : "") +
-          "</span>" +
-        "</div>" +
+        binLine +
+        codeLine +
       "</div>" +
-      '<div class="row-stock">' +
-        '<div class="row-stock-num' + (low ? " low" : "") + '">' + p.stock + "</div>" +
-        '<div class="row-stock-label">' + t("inStock") + "</div>" +
+      '<div class="pcard-figures">' +
+        '<span class="slot-money">' + (priceVal > 0 ? money(priceVal) : "") + "</span>" +
+        '<span class="pcard-stock">' +
+          '<span class="row-stock-num' + (low ? " low" : "") + '">' + p.stock + "</span>" +
+          '<span class="row-stock-label">' + t("inStock") + "</span>" +
+        "</span>" +
       "</div>" +
-      '<div class="row-actions">' +
-        '<button type="button" class="icon-btn icon-btn-up" title="Stock in" data-action="quick-in" data-id="' + p.id + '">' + icon("up", 14) + "</button>" +
-        '<button type="button" class="icon-btn icon-btn-down" title="Stock out" data-action="quick-out" data-id="' + p.id + '">' + icon("down", 14) + "</button>" +
-        '<button type="button" class="icon-btn" title="Edit" data-action="open-edit-modal" data-id="' + p.id + '">' + icon("pencil", 14) + "</button>" +
+      (low ? '<div class="pcard-flags"><span class="low-flag">' + icon("alert", 12) + " " + t("low") + "</span></div>" : "") +
+      '<div class="pcard-actions">' +
+        '<button type="button" class="pcard-act pcard-act-in" data-action="quick-in" data-id="' + p.id + '">' +
+          icon("up", 14) + "<span>" + escapeHtml(t("tabIn")) + "</span>" +
+        "</button>" +
+        '<button type="button" class="pcard-act pcard-act-out" data-action="quick-out" data-id="' + p.id + '">' +
+          icon("down", 14) + "<span>" + escapeHtml(t("tabOut")) + "</span>" +
+        "</button>" +
+        '<button type="button" class="pcard-act pcard-act-edit" data-action="open-edit-modal" data-id="' + p.id +
+          '" title="' + escapeHtml(t("editProduct")) + '" aria-label="' + escapeHtml(t("editProduct")) + '">' +
+          icon("pencil", 14) +
+        "</button>" +
       "</div>" +
-      (pickCell || resCell || codeCell || priceCell ?
-        '<div class="product-extra">' + pickCell + resCell + codeCell + priceCell + "</div>" : ""
-      ) +
     "</div>"
   );
 }
@@ -4281,7 +4322,14 @@ function showToast(msg) {
 
 // ---------------- actions ----------------
 
-function setTab(tab) { state.tab = tab; render(); }
+function setTab(tab) {
+  // Going to a page from the menu (or pressing Back) ends whatever journey a
+  // product card started, so the remembered origin is dropped. Without this,
+  // opening Stock In from the home menu would still send Back to Overview.
+  if (tab !== state.returnTab) state.returnTab = "";
+  state.tab = tab;
+  render();
+}
 
 function openAddModal() {
   state.returnTab = state.tab;
@@ -4308,6 +4356,7 @@ async function openEditModal(id) {
   const p = state.products.find(p => p.id === id);
   if (!p) return;
   state.returnTab = state.tab;
+  state.focusProductId = id;
   state.editingProductId = id;
   state.newName = p.name;
   state.newCategory = p.category;
@@ -5894,8 +5943,16 @@ appEl.addEventListener("click", (e) => {
   else if (action === "cancel-bulk-delete") { state.deleteConfirming = false; render(); }
   else if (action === "confirm-bulk-delete") performBulkDelete();
   // The row's arrows still open the one-item form; they are the only way in now.
-  else if (action === "quick-in") { state.tab = "in"; state.inMode = "single"; state.inProductId = el.dataset.id; state.inError = ""; render(); }
-  else if (action === "quick-out") { state.tab = "out"; state.outMode = "single"; state.outProductId = el.dataset.id; state.outError = ""; render(); }
+  // Launched from a product card, so Back belongs to the page that launched it,
+  // not to the home menu — and it should land on that product's card.
+  else if (action === "quick-in") {
+    state.returnTab = state.tab; state.focusProductId = el.dataset.id;
+    state.tab = "in"; state.inMode = "single"; state.inProductId = el.dataset.id; state.inError = ""; render();
+  }
+  else if (action === "quick-out") {
+    state.returnTab = state.tab; state.focusProductId = el.dataset.id;
+    state.tab = "out"; state.outMode = "single"; state.outProductId = el.dataset.id; state.outError = ""; render();
+  }
   else if (action === "remove-photo") {
     state.newPhotos.splice(parseInt(el.dataset.index, 10), 1);
     state.modalError = "";
