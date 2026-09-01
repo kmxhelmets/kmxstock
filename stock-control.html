@@ -13,50 +13,51 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
 </script>
 <style>
   :root {
-    --signal: #F2A413;
-    --signal-ink: #1a1200;
-    --bg: #0a0a0c;
-    --surface: #17171b;
-    --surface-2: #1f1f25;
-    --border: #2a2a32;
-    --text: #f2f2f4;
-    --text-dim: #8b8b95;
-    --text-dimmer: #55555f;
-    --success: #22c55e;
-    --success-ink: #04170c;
-    --success-bg: #12281a;
-    --success-border: #1c3a26;
-    --danger: #ef4444;
-    --danger-ink: #2a0808;
-    --danger-bg: #2a1416;
-    --danger-border: #3a1e20;
-    --warn-bg: #2b2113; --warn-fg: #fbbf24; --warn-bd: #3f301b;
-    --info-bg: #0c2333; --info-fg: #38bdf8; --info-bd: #143348;
+    --page: #0A0C10;
+    --signal: #FFB627;
+    --signal-ink: #17130A;
+    --bg: #0A0C10;
+    --surface: #14171D;
+    --surface-2: #1C2027;
+    --border: #262C35;
+    --text: #EEF1F5;
+    --text-dim: #8A94A3;
+    --text-dimmer: #59616E;
+    --success: #22C55E;
+    --success-ink: #04170C;
+    --success-bg: #10281B;
+    --success-border: #1D3A29;
+    --danger: #EF4444;
+    --danger-ink: #2A0808;
+    --danger-bg: #3C1F23;
+    --danger-border: #4C282C;
+    --warn-bg: #3E301C; --warn-fg: #FBBF24; --warn-bd: #52411F;
+    --info-bg: #0E2433; --info-fg: #38BDF8; --info-bd: #16344A;
     /* Moving stock is neither a gain nor a loss, so it gets its own blue tone
        rather than reusing the green/red of stock in and out. */
-    --move-bg: #0e2436; --move-fg: #38bdf8; --move-bd: #16354c; --move-ink: #04131f;
+    --move-bg: #0E2433; --move-fg: #38BDF8; --move-bd: #16344A; --move-ink: #04131F;
     /* The reserve tag: a second hue so pick face and reserve are told apart at a
        glance, not by reading the code. */
-    --slot2: #2dd4bf; --slot2-ink: #04231f;
+    --slot2: #34D399; --slot2-ink: #04231F;
     /* The barcode tag, sampled from the reference label: the same muted grey in
        both themes, so it looks identical wherever it appears. */
-    --slot3: #7f8c8d; --slot3-ink: #ffffff;
+    --slot3: #7F8C8D; --slot3-ink: #FFFFFF;
     /* Solid panel-header fills for the Duplicates groups. Darker than the text
        accents so white sits on them cleanly in both themes. */
-    --danger-bar: #c0392b; --warn-bar: #b45309; --info-bar: #0f766e;
+    --danger-bar: #B91C1C; --warn-bar: #A16207; --info-bar: #0F766E;
     /* Placeholder text sits at roughly 4.6:1 against the field, the same weight
        as the reference. --text-dimmer is for decoration and is far too faint to
        read a prompt in. */
-    --placeholder: #7c7c86;
+    --placeholder: #798494;
     /* Field labels sit above larger input text, so a grey that measures fine in
        isolation still reads as faint next to it. They get their own darker
        token rather than the general dim grey. */
-    --label: #c9c9d1;
-    --chip-hover: #3a3a44;
-    --accent-tint: rgba(242,164,19,0.12);
-    --accent-tint-border: rgba(242,164,19,0.4);
-    --focus-ring: rgba(242,164,19,0.15);
-    --empty-icon: #3a3a44;
+    --label: #C6CDD7;
+    --chip-hover: #3A424E;
+    --accent-tint: rgba(255,182,39,0.12);
+    --accent-tint-border: rgba(255,182,39,0.42);
+    --focus-ring: rgba(255,182,39,0.16);
+    --empty-icon: #39414D;
     --radius-sm: 6px;
     --radius: 10px;
     --radius-lg: 16px;
@@ -65,40 +66,47 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     --list-max: 1260px;
   }
   html[data-theme="light"] {
-    --signal: #b45309;
-    --signal-ink: #ffffff;
-    --bg: #f3f4f6;
-    --surface: #ffffff;
-    --surface-2: #eef0f3;
-    --border: #e3e6eb;
-    --text: #1c1f27;
-    --text-dim: #5c6370;
-    --text-dimmer: #9aa2ad;
-    --success: #16a34a;
-    --success-ink: #ffffff;
-    --success-bg: #e8f6ee;
-    --success-border: #bfe8cf;
-    --danger: #dc2626;
-    --danger-ink: #ffffff;
-    --danger-bg: #fdecec;
-    --danger-border: #f6c9c9;
-    --warn-bg: #fdf2df; --warn-fg: #a16207; --warn-bd: #f6e0b5;
-    --info-bg: #e8f3fd; --info-fg: #0d6dc4; --info-bd: #c3e0f8;
-    --move-bg: #e8f3fd; --move-fg: #0369a1; --move-bd: #c3e0f8; --move-ink: #ffffff;
-    --slot2: #0f766e; --slot2-ink: #ffffff;
-    --placeholder: #757575;
-    --label: #374151;
-    --chip-hover: #b9c0c9;
+    --page: #E7E3DB;
+    --signal: #B45309;
+    --signal-ink: #FFFFFF;
+    /* Warm paper: the page is the cream tone and cards sit on it in white, so
+       the separation comes from the card being lighter than its ground rather
+       than from a heavier border. */
+    --bg: #F5F2ED;
+    --surface: #FFFFFF;
+    --surface-2: #EBE7E0;
+    --border: #E2DDD4;
+    --text: #1E1B16;
+    --text-dim: #6E6659;
+    --text-dimmer: #A39A8B;
+    --success: #16A34A;
+    --success-ink: #FFFFFF;
+    --success-bg: #E6F3EA;
+    --success-border: #C2E3CE;
+    --danger: #DC2626;
+    --danger-ink: #FFFFFF;
+    --danger-bg: #FBEAE6;
+    --danger-border: #F2C9C2;
+    --warn-bg: #FAEEDA; --warn-fg: #A16207; --warn-bd: #EDDBB2;
+    --info-bg: #E9F1F8; --info-fg: #0D6DC4; --info-bd: #CCDFEE;
+    --move-bg: #E9F1F8; --move-fg: #0369A1; --move-bd: #CCDFEE; --move-ink: #FFFFFF;
+    --slot2: #0F766E; --slot2-ink: #FFFFFF;
+    /* The duplicate panel headers keep the deeper brick and rust here; on the
+       dark theme they step down so white still sits cleanly on them. */
+    --danger-bar: #C0392B; --warn-bar: #B45309; --info-bar: #0F766E;
+    --placeholder: #7A7266;
+    --label: #4A4239;
+    --chip-hover: #C6BDAE;
     --accent-tint: rgba(180,83,9,0.08);
-    --accent-tint-border: rgba(180,83,9,0.4);
+    --accent-tint-border: rgba(180,83,9,0.42);
     --focus-ring: rgba(180,83,9,0.18);
-    --empty-icon: #c9ced6;
+    --empty-icon: #D6CFC3;
 
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
-    background: var(--bg);
+    background: var(--page);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
       "Noto Sans Khmer", "Khmer OS Battambang", "Khmer OS", "Leelawadee UI", sans-serif;
@@ -130,7 +138,7 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .shell { border: 1px solid var(--border); border-radius: var(--radius-lg); margin: 16px; overflow: hidden; background: var(--bg); transition: background .2s ease; }
-  html[data-theme="light"] .shell { background: var(--surface); box-shadow: 0 1px 3px rgba(20,30,50,0.06); }
+  html[data-theme="light"] .shell { box-shadow: 0 1px 3px rgba(90,72,44,0.07); }
   @media (max-width: 480px) { .shell { margin: 0; border-radius: 0; border-left: none; border-right: none; box-shadow: none; } }
 
   .header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
@@ -176,7 +184,7 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   .launcher-search { margin-bottom: 18px; }
   .launcher-title { font-size: 16px; font-weight: 600; text-align: center; margin: 0 0 20px; color: var(--text); }
   .launcher-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px 16px; }
-  html[data-theme="light"] .launcher-grid { background: var(--surface); border-color: var(--border); box-shadow: 0 10px 30px rgba(30,41,59,.10); }
+  html[data-theme="light"] .launcher-grid { background: var(--surface); border-color: var(--border); box-shadow: 0 10px 30px rgba(90,72,44,.10); }
   .launch-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; background: none; border: none; padding: 6px; cursor: pointer; color: var(--text); font-size: 13px; font-weight: 600; transition: color .15s ease; }
   .launch-tile:hover { color: var(--text); }
   .launch-ic { position: relative; width: 68px; height: 68px; border-radius: 20px; display: flex; align-items: center; justify-content: center; background: var(--tile-bg); color: var(--tile-fg); transition: transform .15s ease, box-shadow .15s ease; }
@@ -190,7 +198,7 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     cursor: pointer; transition: color .15s ease, border-color .15s ease;
   }
   .back-btn:hover { color: var(--text); border-color: var(--chip-hover); }
-  .hist-btn { color: #f59e0b; }
+  .hist-btn { color: var(--warn-bar); }
   .section-title { font-size: 19px; font-weight: 700; margin: 0; color: var(--text); line-height: 1.2; }
   .section-ic { display: inline-flex; align-items: center; flex-shrink: 0; }
   .header svg.icon-up { color: var(--success); }
@@ -229,7 +237,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--radius);
     background: var(--surface); border: 1px solid var(--border);
   }
-  html[data-theme="light"] .history-row { background: var(--bg); }
 
   /* Overview is a card grid: one self-contained panel per product, laid out in
      as many columns as the width allows. One column on a phone, up to three on
@@ -250,8 +257,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   /* Held for a moment on the card you came back to, so your eye lands on it
      instead of searching the grid for where you were. */
   .product-card.is-back { border-color: var(--signal); box-shadow: 0 0 0 3px var(--accent-tint); }
-  html[data-theme="light"] .product-card { background: var(--bg); }
-  html[data-theme="light"] .product-card:hover { background: var(--surface-2); }
 
   /* Photo left, age right — the two things you take in before reading. */
   .pcard-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
@@ -366,11 +371,11 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   .empty-inline { text-align: center; padding: 40px 0; color: var(--text-dim); font-size: 14px; }
 
   .stock-form { max-width: 420px; }
-  /* A small colour chip ties each field to its tag on the Overview row: orange
+  /* A small colour chip ties each row to its tag on the Overview card: orange
      for the pick face, teal for the reserve. */
-  .bin-slot-label { display: inline-flex; align-items: center; gap: 6px; }
+  .bin-slot-label { display: flex; align-items: center; gap: 7px; min-width: 0; }
   .bin-slot-label::before {
-    content: ""; width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0;
+    content: ""; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   }
   .bin-slot-pick::before { background: var(--signal); }
   .bin-slot-res::before { background: var(--slot2); }
@@ -521,7 +526,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     border: 1px solid var(--border); border-radius: var(--radius);
     background: var(--surface); margin-bottom: 8px;
   }
-  html[data-theme="light"] .sess-row { background: var(--surface); }
   /* Matches the Overview row's thumbnail so a scanned item looks the same here
      as it does in the list. */
   .sess-thumb {
@@ -580,7 +584,7 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     background: var(--surface); color: var(--text);
     font-size: 14px; font-family: inherit;
   }
-  .sess-note:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  .sess-note:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px var(--accent-tint); }
   .sess-note::placeholder { color: var(--placeholder); }
   .sess-foot .btn { padding: 10px 18px; border-radius: var(--radius); font-size: 14px; }
 
@@ -602,7 +606,7 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     background: var(--surface); color: var(--text); font-size: 15px;
     font-family: inherit;
   }
-  .sess-hw-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  .sess-hw-input:focus { outline: none; border-color: var(--signal); box-shadow: 0 0 0 3px var(--accent-tint); }
   .sess-hw-input::placeholder { color: var(--placeholder); }
   /* No camera (e.g. a computer): drop the video panel entirely and let the
      list fill the space -- the scan box above is all that's needed. */
@@ -646,7 +650,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
        phone there is room for both. */
     .sess-overlay.sess-cam-live .sess-pick { display: flex; }
     .sess-side { flex: 1; min-width: 420px; background: var(--surface); }
-    html[data-theme="light"] .sess-side { background: var(--bg); }
     /* Its own column, so it is not competing with the catalogue for height. */
     .sess-list { max-height: none; }
 
@@ -782,12 +785,38 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   .hint-warn { color: var(--warn-fg); }
 
   /* ---- bins: a pick face and one reserve ---- */
-  /* The editor in Add/Edit Product: two labelled slots, not a growing list. */
+  /* The editor in Add/Edit Product: two labelled slots, not a growing list.
+     They are boxed together under one heading because they answer one
+     question -- where this product lives -- rather than being two unrelated
+     fields. The heading carries the word "location", so each row only has to
+     say which one. */
+  .bin-group {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px;
+  }
+  .bin-group-title {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans Khmer", monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-dim); margin: 0 0 10px;
+  }
+  /* Khmer has no capitals, and the letterspacing pulls its clusters apart. */
+  html[lang="km"] .bin-group-title { letter-spacing: normal; text-transform: none; font-size: 11.5px; }
   .bin-slots { display: flex; flex-direction: column; gap: 8px; }
-  .bin-slot { display: flex; flex-direction: column; gap: 4px; }
-  .bin-slot-label { font-size: 11.5px; font-weight: 600; color: var(--label); }
-  .bin-slot-fields { display: grid; grid-template-columns: minmax(0, 1fr) 84px; gap: 6px; }
-  .bin-slot-qty { text-align: right; font-variant-numeric: tabular-nums; }
+  /* Name, code, count on one line. The label column wraps rather than
+     truncating -- half a Khmer label is worse than a two-line row. */
+  .bin-slot {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) 64px;
+    align-items: center; gap: 8px;
+  }
+  .bin-slot-label { font-size: 12.5px; font-weight: 500; color: var(--text); line-height: 1.3; }
+  .bin-slot-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: .05em;
+  }
+  .bin-slot-qty {
+    text-align: right; font-variant-numeric: tabular-nums;
+    padding-left: 8px; padding-right: 10px;
+  }
   .bin-foot { display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; }
   /* The only computed value on the form, so it reads as a result rather than
      another line of grey text. */
@@ -906,7 +935,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     border: 1px solid var(--border); border-radius: var(--radius);
     overflow: hidden; margin-bottom: 8px; background: var(--surface);
   }
-  html[data-theme="light"] .dup-group { background: var(--bg); }
   .dup-danger { border-color: var(--danger-border); }
   .dup-warn { border-color: var(--warn-bd); }
   .dup-info { border-color: var(--info-bd); }
@@ -953,7 +981,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);
     cursor: pointer; color: var(--text); transition: border-color .15s ease;
   }
-  html[data-theme="light"] .pick-row { background: var(--bg); }
   .pick-row:hover { border-color: var(--signal); }
   .pick-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .pick-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -975,7 +1002,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     background: var(--surface); color: var(--text-dim); cursor: pointer; text-align: center;
     transition: border-color .15s ease, color .15s ease; margin-bottom: 14px;
   }
-  html[data-theme="light"] .import-drop { background: var(--bg); }
   .import-drop:hover { border-color: var(--signal); color: var(--text); }
   .import-drop svg { color: var(--signal); }
   .import-drop-title { font-size: 14px; font-weight: 500; color: var(--text); word-break: break-all; }
@@ -998,7 +1024,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
     background: var(--surface); font-variant-numeric: tabular-nums;
   }
-  html[data-theme="light"] .imp-table { background: var(--bg); }
   .imp-tr {
     display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, .6fr) minmax(0, 1fr);
     gap: 12px; padding: 9px 12px; border-top: 1px solid var(--border); font-size: 13px;
@@ -1013,7 +1038,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm);
     background: var(--surface); border: 1px solid var(--border);
   }
-  html[data-theme="light"] .imp-row { background: var(--bg); }
   .imp-row-bad { background: var(--danger-bg); border-color: var(--danger-border); }
   .imp-num {
     flex-shrink: 0; min-width: 22px; font-size: 11px; color: var(--text-dimmer);
@@ -1086,7 +1110,6 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
     border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border);
     cursor: pointer; color: var(--text); font-size: 14px; transition: border-color .15s ease, background .15s ease;
   }
-  html[data-theme="light"] .del-row { background: var(--bg); }
   .del-row:hover { border-color: var(--chip-hover); }
   .del-row-on { border-color: var(--danger-border); background: var(--danger-bg); }
   /* A product still holding stock can't be deleted -- the row shows why
@@ -2406,6 +2429,7 @@ const I18N = {
     pickFaceLabel: "Pick face", pickFaceFieldLabel: "Pick face Location",
     reserveLabel: "Reserve",
     reserveOptional: "Reserve Location (optional)",
+    binPickPh: "e.g. A1203",
     binReservePh: "e.g. B1104",
     dirToPick: "Reserve \u2192 Pick face",
     dirToReserve: "Pick face \u2192 Reserve",
@@ -2588,6 +2612,7 @@ const I18N = {
     pickFaceFieldLabel: "ទីតាំងរើសទំនិញ",
     reserveLabel: "ទីតាំងបម្រុង",
     reserveOptional: "ទីតាំងបម្រុង (មិនចាំបាច់)",
+    binPickPh: "ឧ. A1203",
     binReservePh: "ឧ. B1104",
     dirToPick: "បម្រុង → ទីតាំងរើស",
     dirToReserve: "ទីតាំងរើស → បម្រុង",
@@ -3066,14 +3091,14 @@ function renderHeader() {
 
 function getMenuTabs() {
   return [
-    { id: "overview", label: t("tabOverview"), icon: "box", bg: "#dbe7fb", fg: "#2563eb" },
-    { id: "in", label: t("tabIn"), icon: "up", bg: "#d7f0e0", fg: "#16a34a" },
-    { id: "out", label: t("tabOut"), icon: "down", bg: "#fbdada", fg: "#ef4444" },
-    { id: "move", label: t("tabMove"), icon: "move", bg: "#dbe9f7", fg: "#0284c7" },
-    { id: "history", label: t("tabHistory"), icon: "history", bg: "#fcecc4", fg: "#d97706" },
-    { id: "duplicates", label: t("tabDuplicates"), icon: "copy", bg: "#e7dcf9", fg: "#9333ea" },
-    { id: "labels", label: t("tabLabels"), icon: "tag", bg: "#d2eef0", fg: "#0d9488" },
-    { id: "delete", label: t("tabDelete"), icon: "trash", bg: "#f9dbe9", fg: "#db2777" },
+    { id: "overview", label: t("tabOverview"), icon: "box", bg: "#DEE6F4", fg: "#2563EB" },
+    { id: "in", label: t("tabIn"), icon: "up", bg: "#DCEFDF", fg: "#15803D" },
+    { id: "out", label: t("tabOut"), icon: "down", bg: "#F8DCD5", fg: "#DC2626" },
+    { id: "move", label: t("tabMove"), icon: "move", bg: "#DDE8F1", fg: "#0369A1" },
+    { id: "history", label: t("tabHistory"), icon: "history", bg: "#FAE7C0", fg: "#B45309" },
+    { id: "duplicates", label: t("tabDuplicates"), icon: "copy", bg: "#E7DDF3", fg: "#7E22CE" },
+    { id: "labels", label: t("tabLabels"), icon: "tag", bg: "#D6EBE8", fg: "#0F766E" },
+    { id: "delete", label: t("tabDelete"), icon: "trash", bg: "#F6DCE4", fg: "#BE185D" },
   ];
 }
 
@@ -4194,15 +4219,18 @@ function renderHistory() {
 // and one reserve holding the bulk behind it. The reserve can be left blank for
 // products that live in a single place.
 function renderBinEditor(editing) {
-  const slot = (i, labelKey) =>
+  // The visible label is short because the heading above already says these
+  // are locations; the full wording stays on the field for a screen reader,
+  // which does not get that heading for free.
+  const slot = (i, labelKey, fieldKey, phKey) =>
     '<div class="bin-slot">' +
       '<span class="bin-slot-label bin-slot-' + (i === 0 ? "pick" : "res") + '">' + t(labelKey) + "</span>" +
-      '<div class="bin-slot-fields">' +
-        '<input id="binCode' + i + '" data-bin-index="' + i + '" data-bin-part="code" value="' + escapeHtml(state.newBins[i].code) +
-          '" class="input" autocomplete="off" />' +
-        '<input type="text" inputmode="numeric" pattern="[0-9]*" id="binQty' + i + '" data-bin-index="' + i +
-          '" data-bin-part="qty" value="' + escapeHtml(state.newBins[i].qty) + '" placeholder="0" class="input bin-slot-qty" />' +
-      "</div>" +
+      '<input id="binCode' + i + '" data-bin-index="' + i + '" data-bin-part="code" value="' + escapeHtml(state.newBins[i].code) +
+        '" placeholder="' + escapeHtml(t(phKey)) + '" aria-label="' + escapeHtml(t(fieldKey)) +
+        '" class="input bin-slot-code" autocomplete="off" />' +
+      '<input type="text" inputmode="numeric" pattern="[0-9]*" id="binQty' + i + '" data-bin-index="' + i +
+        '" data-bin-part="qty" value="' + escapeHtml(state.newBins[i].qty) + '" placeholder="0"' +
+        ' aria-label="' + escapeHtml(t(labelKey) + " \u00b7 " + t("inStock")) + '" class="input bin-slot-qty" />' +
     "</div>";
 
   const filled = state.newBins.filter(b => String(b.code || "").trim() || Math.max(0, parseInt(b.qty, 10) || 0) > 0);
@@ -4213,9 +4241,12 @@ function renderBinEditor(editing) {
 
   return (
     '<div class="form-group">' +
-      '<div class="bin-slots">' +
-        slot(0, "pickFaceFieldLabel") +
-        slot(1, "reserveOptional") +
+      '<div class="bin-group">' +
+        '<p class="bin-group-title">' + t("binsLabel") + "</p>" +
+        '<div class="bin-slots">' +
+          slot(0, "pickFaceLabel", "pickFaceFieldLabel", "binPickPh") +
+          slot(1, "reserveLabel", "reserveOptional", "binReservePh") +
+        "</div>" +
       "</div>" +
       '<div class="bin-foot">' +
         '<span class="bin-total">' + t("inStock") + ": <strong>" + total + "</strong></span>" +
