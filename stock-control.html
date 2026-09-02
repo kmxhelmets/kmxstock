@@ -1385,7 +1385,7 @@ const auth = getAuth(firebaseApp);
 // KEEP THIS IN STEP WITH THE FIRESTORE RULES - the rules decide who may
 // really delete, and they check the same address.
 const OWNER_EMAILS = [
-  "owner@kmx.local",
+  "sengpheng.sp@gmail.com",
 ];
 
 // Tabs only the owner may open. Staff never see these tiles, and
@@ -3170,7 +3170,13 @@ function renderHeader() {
           '<div class="brand-mark">' + icon("box", 18) + "</div>" +
           '<div class="brand-text">' +
             "<h1>KMX Helmets</h1>" +
-            t("appSub") +
+            // Who the app thinks you are, so a wrong account is obvious.
+            '<p>' + escapeHtml(t("appSub")) +
+              (session.user
+                ? " \u00b7 " + escapeHtml(session.user.email) +
+                  (session.user.owner ? " (owner)" : " (staff)")
+                : "") +
+            "</p>" +
           "</div>" +
         "</div>" +
         '<div class="header-btns">' +
