@@ -4597,6 +4597,10 @@ function scanBeep() {
   try { if (navigator.vibrate) navigator.vibrate(35); } catch (e) { /* not supported */ }
 }
 
+// Typed stock moves never open the camera, so the beep would still be locked
+// when the button is pressed. The first tap anywhere unlocks it.
+document.addEventListener("pointerdown", () => { primeScanBeep(); }, { once: true, passive: true });
+
 // The scanner overlay lives OUTSIDE #app and is managed imperatively: render()
 // replaces #app's innerHTML, which would tear down the <video> and drop the
 // camera stream mid-scan.
@@ -5867,6 +5871,7 @@ async function submitStockIn() {
       productId: product.id, productName: product.name, type: "in", qty: qty,
       bin: describeMoves(alloc.moves), note: state.inNote.trim(), date: Date.now(),
     });
+    scanBeep();
     showToast("+" + qty + " " + product.name);
     state.inProductId = ""; state.inQty = ""; state.inNote = "";
     render();
@@ -5891,6 +5896,7 @@ async function submitStockOut() {
       productId: product.id, productName: product.name, type: "out", qty: qty,
       bin: describeMoves(alloc.moves), note: state.outNote.trim(), date: Date.now(),
     });
+    scanBeep();
     showToast("-" + qty + " " + product.name);
     state.outProductId = ""; state.outQty = ""; state.outNote = "";
     render();
@@ -5949,6 +5955,7 @@ async function submitMove() {
       productId: product.id, productName: product.name, type: "move", qty: qty,
       bin: fromCode + " \u2192 " + toCode, note: state.moveNote.trim(), date: now,
     });
+    scanBeep();
     showToast(t("toastMoved") + " " + qty + " \u00b7 " + fromCode + " \u2192 " + toCode);
     state.moveQty = ""; state.moveNote = ""; state.moveNewCode = "";
     render();
