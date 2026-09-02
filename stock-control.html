@@ -1273,10 +1273,60 @@ catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   input:focus-visible, select:focus-visible, button:focus-visible {
     outline: 2px solid var(--signal); outline-offset: 2px;
   }
+
+  /* ---------------- Login screen ---------------- */
+  .login-screen {
+    position: fixed; inset: 0; z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; background: var(--bg);
+  }
+  /* An author "display" beats the browser's built-in [hidden] rule, so the
+     overlay needs to be told to disappear explicitly. */
+  .login-screen[hidden] { display: none; }
+  .login-card {
+    width: 100%; max-width: 380px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 26px 22px;
+  }
+  .login-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .login-brand h1 { font-size: 19px; margin: 0; }
+  .login-sub { color: var(--text-dim); font-size: 13px; margin: 0 0 20px; }
+  .login-label {
+    display: block; font-size: 13px; color: var(--label);
+    margin: 0 0 8px; font-weight: 600;
+  }
+  .login-text {
+    width: 100%; box-sizing: border-box; padding: 13px 14px;
+    border-radius: 12px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text);
+    font-size: 16px; font-family: inherit; margin-bottom: 16px;
+  }
+  .login-text::placeholder { color: var(--placeholder); }
+  .login-pw-wrap { position: relative; }
+  .login-pw-wrap .login-text { padding-right: 68px; }
+  .login-eye {
+    position: absolute; top: 8px; right: 8px;
+    padding: 6px 10px; border-radius: 8px; cursor: pointer;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); font-size: 12px; font-family: inherit;
+  }
+  .login-go {
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    background: var(--signal); color: var(--signal-ink);
+    font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .login-go[disabled] { opacity: .55; cursor: default; }
+  .login-err {
+    background: var(--danger-bg); border: 1px solid var(--danger-border);
+    color: var(--danger); border-radius: 10px;
+    padding: 10px 12px; font-size: 13px; margin-bottom: 14px;
+  }
+  .login-foot { text-align: center; color: var(--text-dimmer); font-size: 12px; margin: 16px 0 0; }
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="login" class="login-screen"></div>
+<div id="app" hidden></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
@@ -1285,8 +1335,13 @@ import {
   persistentLocalCache, persistentMultipleTabManager,
   collection, doc, addDoc, updateDoc, deleteDoc,
   getDoc, getDocFromCache, setDoc, deleteField,
-  onSnapshot, query, orderBy
+  onSnapshot, query, orderBy,
+  terminate, clearIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  setPersistence, browserSessionPersistence
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 // ============================================================
 // Connected to your existing nija-helmets Firebase project.
@@ -1315,6 +1370,51 @@ try {
   // it just pays the full read cost on each load.
   console.warn("offline cache unavailable, falling back to memory only", err);
   db = getFirestore(firebaseApp);
+}
+
+const auth = getAuth(firebaseApp);
+
+// ============================================================
+// STAFF LOGIN
+// Each person signs in with their own email and password, created
+// in the Firebase console under Authentication > Users.
+// ============================================================
+
+// Emails listed here get the owner role: the History and Delete tiles.
+// Everyone else who signs in is a staff member.
+// KEEP THIS IN STEP WITH THE FIRESTORE RULES - the rules decide who may
+// really delete, and they check the same address.
+const OWNER_EMAILS = [
+  "owner@kmx.local",
+];
+
+// Tabs only the owner may open. Staff never see these tiles, and
+// the Firestore rules block deletes for them regardless.
+const OWNER_ONLY_TABS = ["history", "delete"];
+
+// Signed out automatically after this long with no taps, so an app
+// left open on a counter does not stay usable all night.
+const IDLE_LOGOUT_MS = 30 * 60 * 1000;
+
+const session = {
+  user: null,      // { name, email, owner } once signed in
+  ready: false,    // Firebase has told us whether anyone is signed in
+  busy: false,
+  showPw: false,
+  error: "",
+  email: "",       // what is typed on the login screen
+  password: "",
+};
+function isOwner() { return !!(session.user && session.user.owner); }
+function lt(en, kh) { return state.lang === "kh" ? kh : en; }
+
+// The last email is remembered so staff only type their password each
+// morning. The password itself is never stored.
+function lastEmail() {
+  try { return localStorage.getItem("kmx-last-email") || ""; } catch (e) { return ""; }
+}
+function rememberEmail(v) {
+  try { localStorage.setItem("kmx-last-email", v); } catch (e) { /* private mode */ }
 }
 
 const CATEGORIES = [
@@ -3056,7 +3156,7 @@ function renderHeader() {
             '<span class="section-ic" style="color:' + color + '">' + icon(ic, 20) + "</span>" +
             '<h1 class="section-title">' + escapeHtml(title) + "</h1>" +
           "</div>" +
-          (state.tab === "product-form" && state.editingProductId
+          (state.tab === "product-form" && state.editingProductId && isOwner()
             ? '<div class="header-btns"><button type="button" class="theme-btn hist-btn" data-action="view-product-history" title="' + escapeHtml(t("tabHistory")) + '" aria-label="' + escapeHtml(t("tabHistory")) + '">' + icon("history", 18) + "</button></div>"
             : "") +
         "</div>" +
@@ -3074,6 +3174,9 @@ function renderHeader() {
           "</div>" +
         "</div>" +
         '<div class="header-btns">' +
+        '<button type="button" class="theme-btn" data-action="logout" title="' + escapeHtml(lt("Sign out", "\u1785\u17c1\u1789")) + '" aria-label="' + escapeHtml(lt("Sign out", "\u1785\u17c1\u1789")) + '">' +
+          icon("lock", 16) +
+        "</button>" +
         '<button type="button" class="theme-btn lang-btn" data-action="toggle-lang" title="' + escapeHtml(state.lang === "kh" ? "Switch to English" : "\u1794\u17d2\u178a\u17bc\u179a\u1791\u17c5\u1797\u17b6\u179f\u17b6\u1781\u17d2\u1798\u17c2\u179a") + '">' +
           (state.lang === "kh" ? "EN" : "\u1781\u17d2\u1798\u17c2\u179a") +
         "</button>" +
@@ -3090,6 +3193,12 @@ function renderHeader() {
 }
 
 function getMenuTabs() {
+  return getAllMenuTabs().filter(
+    tb => isOwner() || OWNER_ONLY_TABS.indexOf(tb.id) === -1
+  );
+}
+
+function getAllMenuTabs() {
   return [
     { id: "overview", label: t("tabOverview"), icon: "box", bg: "#DEE6F4", fg: "#2563EB" },
     { id: "in", label: t("tabIn"), icon: "up", bg: "#DCEFDF", fg: "#15803D" },
@@ -4354,6 +4463,8 @@ function showToast(msg) {
 // ---------------- actions ----------------
 
 function setTab(tab) {
+  // Staff cannot reach an owner-only page even by an old link or a stale tap.
+  if (!isOwner() && OWNER_ONLY_TABS.indexOf(tab) !== -1) return;
   // Going to a page from the menu (or pressing Back) ends whatever journey a
   // product card started, so the remembered origin is dropped. Without this,
   // opening Stock In from the home menu would still send Back to Overview.
@@ -5997,6 +6108,7 @@ appEl.addEventListener("click", (e) => {
       render();
     }
   }
+  else if (action === "logout") doLogout();
   else if (action === "toggle-theme") toggleTheme();
   else if (action === "toggle-lang") toggleLang();
   else if (action === "scan") startScan(el.dataset.scanField);
@@ -6146,8 +6258,16 @@ appEl.addEventListener("change", (e) => {
 
 // ---------------- Firestore live sync ----------------
 
-if (!FIREBASE_NOT_CONFIGURED) {
-  onSnapshot(collection(db, "stock_products"), (snap) => {
+// Nothing is read from Firestore until somebody is signed in. The rules
+// reject unauthenticated reads anyway, so starting early would only produce
+// permission errors in the console.
+let unsubProducts = null;
+let unsubTxns = null;
+
+function startListeners() {
+  if (FIREBASE_NOT_CONFIGURED || unsubProducts) return;
+
+  unsubProducts = onSnapshot(collection(db, "stock_products"), (snap) => {
     state.products = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
     state.productsLoaded = true;
     render();
@@ -6158,7 +6278,7 @@ if (!FIREBASE_NOT_CONFIGURED) {
   });
 
   const txnQuery = query(collection(db, "stock_transactions"), orderBy("date", "desc"));
-  onSnapshot(txnQuery, (snap) => {
+  unsubTxns = onSnapshot(txnQuery, (snap) => {
     state.transactions = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
     state.transactionsLoaded = true;
     render();
@@ -6168,6 +6288,182 @@ if (!FIREBASE_NOT_CONFIGURED) {
     render();
   });
 }
+
+function stopListeners() {
+  if (unsubProducts) { unsubProducts(); unsubProducts = null; }
+  if (unsubTxns) { unsubTxns(); unsubTxns = null; }
+}
+
+// ---------------- Login screen ----------------
+
+function renderLogin() {
+  const loginEl = document.getElementById("login");
+  const appEl2 = document.getElementById("app");
+  if (!loginEl || !appEl2) return;
+
+  if (session.user) {
+    loginEl.hidden = true;
+    loginEl.innerHTML = "";
+    appEl2.hidden = false;
+    return;
+  }
+
+  appEl2.hidden = true;
+  loginEl.hidden = false;
+
+  if (!session.ready) {
+    loginEl.innerHTML = '<div class="login-card"><div class="loading">' +
+      '<span class="spinner"></span> ' + escapeHtml(t("loading")) + "</div></div>";
+    return;
+  }
+
+  loginEl.innerHTML =
+    '<div class="login-card">' +
+      '<div class="login-brand">' +
+        '<div class="brand-mark">' + icon("box", 18) + "</div>" +
+        "<h1>KMX Helmets</h1>" +
+      "</div>" +
+      '<p class="login-sub">' + escapeHtml(lt("Stock Control", "\u1782\u17d2\u179a\u1794\u17cb\u1782\u17d2\u179a\u1784\u179f\u17d2\u178f\u17bb\u1780")) + "</p>" +
+      (session.error ? '<div class="login-err">' + escapeHtml(session.error) + "</div>" : "") +
+      '<span class="login-label">' + escapeHtml(lt("Email", "\u17a2\u17ca\u17b8\u1798\u17c2\u179b")) + "</span>" +
+      '<input id="login-email" class="login-text" type="email" inputmode="email" ' +
+        'autocomplete="username" autocapitalize="off" spellcheck="false" ' +
+        'placeholder="name@example.com" value="' + escapeHtml(session.email) + '" />' +
+      '<span class="login-label">' + escapeHtml(lt("Password", "\u1796\u17b6\u1780\u17d2\u1799\u179f\u1798\u17d2\u1784\u17b6\u178f\u17cb")) + "</span>" +
+      '<div class="login-pw-wrap">' +
+        '<input id="login-password" class="login-text" type="' + (session.showPw ? "text" : "password") + '" ' +
+          'autocomplete="current-password" value="' + escapeHtml(session.password) + '" />' +
+        '<button type="button" class="login-eye" data-login-action="toggle-pw">' +
+          escapeHtml(session.showPw ? lt("Hide", "\u179b\u17b6\u1780\u17cb") : lt("Show", "\u1798\u17be\u179b")) +
+        "</button>" +
+      "</div>" +
+      '<button type="button" class="login-go" data-login-action="go"' + (session.busy ? " disabled" : "") + ">" +
+        escapeHtml(session.busy
+          ? lt("Signing in\u2026", "\u1780\u17c6\u1796\u17bb\u1784\u1785\u17bc\u179b\u2026")
+          : lt("Sign in", "\u1785\u17bc\u179b\u1794\u17d2\u179a\u17be")) +
+      "</button>" +
+      '<p class="login-foot">' + escapeHtml(lt("Shop use only", "\u1794\u17d2\u179a\u17be\u1780\u17d2\u1793\u17bb\u1784\u17a0\u17b6\u1784\u1794\u17c9\u17bb\u178e\u17d2\u178e\u17c4\u17c7")) + "</p>" +
+    "</div>";
+
+  // Land the cursor where there is something left to type.
+  const focusEl = document.getElementById(session.email ? "login-password" : "login-email");
+  if (focusEl) {
+    focusEl.focus();
+    try { focusEl.setSelectionRange(focusEl.value.length, focusEl.value.length); } catch (e) { /* not text */ }
+  }
+}
+
+document.getElementById("login").addEventListener("click", (e) => {
+  if (e.target.closest('[data-login-action="toggle-pw"]')) {
+    session.showPw = !session.showPw;
+    renderLogin();
+    return;
+  }
+  if (e.target.closest('[data-login-action="go"]')) doLogin();
+});
+
+document.getElementById("login").addEventListener("input", (e) => {
+  if (e.target.id === "login-email") session.email = e.target.value;
+  else if (e.target.id === "login-password") session.password = e.target.value;
+});
+
+document.getElementById("login").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  if (e.target.id === "login-email" || e.target.id === "login-password") doLogin();
+});
+
+async function doLogin() {
+  if (session.busy) return;
+  const email = (session.email || "").trim().toLowerCase();
+  const password = session.password || "";
+  if (!email || !password) {
+    session.error = lt("Enter your email and password.", "\u179f\u17bc\u1798\u1794\u1789\u17d2\u1785\u17bc\u179b\u17a2\u17ca\u17b8\u1798\u17c2\u179b \u1793\u17b7\u1784\u1796\u17b6\u1780\u17d2\u1799\u179f\u1798\u17d2\u1784\u17b6\u178f\u17cb\u17d4");
+    renderLogin();
+    return;
+  }
+  session.busy = true;
+  session.error = "";
+  renderLogin();
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    rememberEmail(email);
+    session.password = "";
+  } catch (err) {
+    const code = (err && err.code) || "";
+    console.error("login failed", code);
+    session.error = code === "auth/too-many-requests"
+      ? lt("Too many attempts. Wait a few minutes.", "\u1796\u17d2\u1799\u17b6\u1799\u17b6\u1798\u1785\u17d2\u179a\u17be\u1793\u178a\u1784\u1796\u17c1\u1780\u17d4 \u179f\u17bc\u1798\u179a\u1784\u17cb\u1785\u17b6\u17c6\u1794\u17c9\u17bb\u1793\u17d2\u1798\u17b6\u1793\u1793\u17b6\u1791\u17b8\u17d4")
+      : lt("Wrong email or password.", "\u17a2\u17ca\u17b8\u1798\u17c2\u179b \u17ac\u1796\u17b6\u1780\u17d2\u1799\u179f\u1798\u17d2\u1784\u17b6\u178f\u17cb\u1798\u17b7\u1793\u178f\u17d2\u179a\u17b9\u1798\u178f\u17d2\u179a\u17bc\u179c\u17d4");
+  }
+  session.busy = false;
+  renderLogin();
+}
+
+async function doLogout() {
+  stopListeners();
+  session.password = "";
+  session.error = "";
+  session.showPw = false;
+  session.email = lastEmail();
+  try { await signOut(auth); } catch (err) { console.error("sign out failed", err); }
+
+  // The offline cache keeps a full copy of the catalogue in the browser, and
+  // that copy survives sign-out - a stripped copy of this file served from the
+  // same address could still read it. So the cache is wiped on the way out.
+  // Firestore only allows this once the client is shut down, which means the
+  // page has to reload afterwards.
+  try {
+    await terminate(db);
+    await clearIndexedDbPersistence(db);
+  } catch (err) {
+    console.warn("could not clear offline cache", err);
+  }
+  location.reload();
+}
+
+// ---------------- Idle sign-out ----------------
+
+let idleTimer = null;
+function resetIdleTimer() {
+  if (idleTimer) clearTimeout(idleTimer);
+  if (!session.user) return;
+  idleTimer = setTimeout(() => { doLogout(); }, IDLE_LOGOUT_MS);
+}
+["click", "keydown", "touchstart"].forEach(ev => {
+  document.addEventListener(ev, () => { if (session.user) resetIdleTimer(); }, { passive: true });
+});
+
+// ---------------- Auth state ----------------
+
+// Session persistence: closing the browser signs everyone out, so a phone
+// that leaves the shop cannot resume yesterday's session.
+setPersistence(auth, browserSessionPersistence).catch(err => {
+  console.error("persistence", err);
+});
+
+onAuthStateChanged(auth, (user) => {
+  session.ready = true;
+  if (user) {
+    const email = (user.email || "").toLowerCase();
+    session.user = {
+      name: email.split("@")[0],
+      email: email,
+      owner: OWNER_EMAILS.map(x => x.toLowerCase()).indexOf(email) !== -1,
+    };
+    startListeners();
+    resetIdleTimer();
+  } else {
+    session.user = null;
+    stopListeners();
+    state.products = [];
+    state.transactions = [];
+    state.productsLoaded = false;
+    state.transactionsLoaded = false;
+    state.tab = "home";
+  }
+  renderLogin();
+  render();
+});
 
 // Arrow keys / Escape while the lightbox is open.
 document.addEventListener("keydown", (e) => {
@@ -6209,6 +6505,8 @@ appEl.addEventListener("touchend", (e) => {
   document.documentElement.setAttribute("data-theme", t);
 })();
 
+session.email = lastEmail();
+renderLogin();
 render();
 </script>
 </body>
